@@ -11,8 +11,7 @@ public:
     ROS_INFO("Sequence ID %d",msg->header.seq);
     ROS_INFO("ODOMETRY velocity [%f],[%f],[%f],[%f]",msg->velocity[0],msg->velocity[1],msg->velocity[2],msg->velocity[3]);
     ROS_INFO("ODOMETRY position [%f],[%f],[%f],[%f]",msg->position[0],msg->position[1],msg->position[2],msg->position[3]);
-    
-    //ROS_INFO("TIME %d",msg->header.stamp.secs);
+    ROS_INFO("TIME %lf",msg->header.stamp);
     ROS_INFO("ROS TIME %f",ros::Time::now());
     for(int arrayposition=0;arrayposition<4;arrayposition++){
       deltaPosition[arrayposition] = msg->position[arrayposition]-tempPosition[arrayposition];
