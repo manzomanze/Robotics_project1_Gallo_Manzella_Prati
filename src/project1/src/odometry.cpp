@@ -10,6 +10,8 @@ public:
   void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
     ROS_INFO("Sequence ID %d",msg->header.seq);
     ROS_INFO("ODOMETRY velocity [%f],[%f],[%f],[%f]",msg->velocity[0],msg->velocity[1],msg->velocity[2],msg->velocity[3]);
+    ROS_INFO("ODOMETRY velocity IF IT IS RadPM [%f],[%f],[%f],[%f]",msg->velocity[0]/60*42/(2*3.14),msg->velocity[1]/60*42/(2*3.14),
+    msg->velocity[2]/60*42/(2*3.14),msg->velocity[3]/60*42/(2*3.14));
     ROS_INFO("ODOMETRY position [%f],[%f],[%f],[%f]",msg->position[0],msg->position[1],msg->position[2],msg->position[3]);
 
     ROS_INFO("TIME sec  %ld",msg->header.stamp.sec);
