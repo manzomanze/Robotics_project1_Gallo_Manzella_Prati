@@ -10,22 +10,36 @@ public:
   void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
     ROS_INFO("Sequence ID %d",msg->header.seq);
     ROS_INFO("ODOMETRY velocity [%f],[%f],[%f],[%f]",msg->velocity[0],msg->velocity[1],msg->velocity[2],msg->velocity[3]);
+    ROS_INFO("ODOMETRY velocity IF IT IS RadPM [%f],[%f],[%f],[%f]",msg->velocity[0]/60*42/(2*3.14),msg->velocity[1]/60*42/(2*3.14),
+    msg->velocity[2]/60*42/(2*3.14),msg->velocity[3]/60*42/(2*3.14));
     ROS_INFO("ODOMETRY position [%f],[%f],[%f],[%f]",msg->position[0],msg->position[1],msg->position[2],msg->position[3]);
-    ROS_INFO("TIME %lf",msg->header.stamp);
-    ROS_INFO("ROS TIME %f",ros::Time::now());
+
+    ROS_INFO("TIME sec  %ld",msg->header.stamp.sec);
+    ROS_INFO("TIME nsec %ld",msg->header.stamp.nsec);
+
+    ROS_INFO("TIME NOW  %f",msg->header.stamp.toSec());
+    ROS_INFO("TIME PREVIOUS %f",previousTime);    
+
+    deltaTime = msg->header.stamp.toSec()-previousTime;
+    previousTime = msg->header.stamp.toSec();
+    ROS_INFO("Delta time sec %f",deltaTime);
+    
     for(int arrayposition=0;arrayposition<4;arrayposition++){
       deltaPosition[arrayposition] = msg->position[arrayposition]-tempPosition[arrayposition];
       tempPosition[arrayposition] = msg->position[arrayposition]; 
     }
-    ROS_INFO("DELTA position [%f],[%f],[%f],[%f]\n",deltaPosition[0],deltaPosition[1],deltaPosition[2],deltaPosition[3]);
+    ROS_INFO("DELTA position [%f],[%f],[%f],[%f]",deltaPosition[0],deltaPosition[1],deltaPosition[2],deltaPosition[3]);
+    ROS_INFO("ANGULAR WHEEL VELOCITY [%f],[%f],[%f],[%f]\n",deltaPosition[0]/deltaTime, deltaPosition[1]/deltaTime,
+                                      deltaPosition[2]/deltaTime, deltaPosition[3]/deltaTime);
   }
 
   //constructor of the class OdometryCalculator
   OdometryCalculator(){ 
     tempPosition[0] = 17269.000000;
-    tempPosition[0] = 11412.000000;
-    tempPosition[0] = 15462.000000;
-    tempPosition[0] = 13165.000000;
+    tempPosition[1] = 11412.000000;
+    tempPosition[2] = 15462.000000;
+    tempPosition[3] = 13165.000000;
+    previousTime = ros::Time::now().toSec();
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
     //linear_anglular_velocities = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   }
@@ -33,7 +47,7 @@ public:
 private:
   float tempPosition[4];
   float deltaPosition[4];
-  int deltaTime,previousTime;
+  double deltaTime,previousTime;
   ros::NodeHandle n;
   ros::Subscriber sub_encoder_wheel;
   ros::Publisher linear_angular_velocities;
