@@ -29,10 +29,6 @@ catkin_package(CATKIN_DEPENDS message_runtime)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(pubtouseinthefuture src/pubtouseinthefuture.cpp)
-add_dependencies(pubtouseinthefuture ${catkin_EXPORTED_TARGETS})
-target_link_libraries(pubtouseinthefuture ${catkin_LIBRARIES})
-
 add_executable(odometry src/odometry.cpp)
 add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometry ${catkin_LIBRARIES})

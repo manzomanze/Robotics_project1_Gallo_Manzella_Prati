@@ -1,7 +1,6 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h" //message type of encoder from bag
 #include "geometry_msgs/TwistStamped.h" //message type for linear and angular velocities
-#include "pub_sub/Num.h"
 
 
 
