@@ -71,39 +71,59 @@ public:
     // it's not a big deale because the first bunch of msgs are just in still position
     if(isFirstMeasure){
       prevMsg = actual_msg;
+      prevMsgEachFour = actual_msg;
       isFirstMeasure = 0;
       ROS_INFO("This was the first message, no delta are computed");
       return;
     }
 
-    // this cycle has the puropose of computing the delta on the number of ticks
+    // delta time computed at each msg
+    deltaTime = actual_msg.time - prevMsg.time;
+    ROS_INFO("Delta time: %f", deltaTime);
+
+    double computedVel[N_WHEELS];
+    // this for cycle is used to store and compute the velocity starting form the ticks
     for (int i = 0; i < N_WHEELS; i++)
     {
       deltaPosition[i] = actual_msg.wheel_info.count_ticks[i] - prevMsg.wheel_info.count_ticks[i];
+      double tickPerSec = (deltaPosition[i]/deltaTime);
+      computedVel[i] = tickPerSec * RESOLUTION;
     }
 
     ROS_INFO("Delta ticks: %f %f %f %f", deltaPosition[FL], deltaPosition[FR],
                                           deltaPosition[RL], deltaPosition[RR]);
 
-    deltaTime = actual_msg.time - prevMsg.time;
-    
-    ROS_INFO("Delta time: %f", deltaTime);
-
-    double computedVel[N_WHEELS];
-    for (int i = 0; i < N_WHEELS; i++)
-    {
-      double tickPerSec = (deltaPosition[i]/deltaTime);
-      computedVel[i] = tickPerSec * RESOLUTION;
-    }
-
     ROS_INFO("Computed velocity: %f %f %f %f", computedVel[FL], computedVel[FR],
                                                 computedVel[RL], computedVel[RR]); 
-
-    std::cout << std::endl;
 
     // here the previous message is updated
     prevMsg = actual_msg;
 
+    // here I need to check that the four message are passed
+    deltaMsgNumber = actual_msg.seq - prevMsgEachFour.seq;
+    // we enter this if each 4 messages
+    if(deltaMsgNumber == 4){
+      // now the delta time is performed between msgs that are distant 4 msgs
+      deltaTime = actual_msg.time - prevMsgEachFour.time;
+      double computedVelEachFour[N_WHEELS];
+      for (int i = 0; i < N_WHEELS; i++)
+      {
+        deltaPosEachFour[i] = actual_msg.wheel_info.count_ticks[i] - prevMsgEachFour.wheel_info.count_ticks[i]; 
+        double tickPerSec = (deltaPosEachFour[i]/deltaTime);
+        computedVelEachFour[i] = tickPerSec * RESOLUTION;
+      }
+
+      ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachFour[FL], deltaPosEachFour[FR],
+                                                          deltaPosEachFour[RL], deltaPosEachFour[RR]);
+
+      ROS_INFO("Computed velocity each four MSGS: %f %f %f %f", computedVelEachFour[FL], computedVelEachFour[FR],
+                                                                computedVelEachFour[RL], computedVelEachFour[RR]);
+      // we reset the message 
+      prevMsgEachFour = actual_msg;
+    }
+
+
+    std::cout << std::endl;
 
   }
 
@@ -118,10 +138,17 @@ private:
   int isFirstMeasure = 1;
   
   t_msg prevMsg;
+  // here we use a variable to store the message only after 4 messages
+  // the idea is to limit the noise
+  t_msg prevMsgEachFour;
 
-  double deltaPosition[4];
+  double deltaPosition[N_WHEELS];
   double deltaTime;
 
+  // here we declare the variables used for the computation of the velocity with less noise (hopefully)
+  int deltaMsgNumber = 0;
+  double deltaPosEachFour[N_WHEELS];
+  
   ros::NodeHandle n;
   ros::Subscriber sub_encoder_wheel;
   ros::Publisher linear_angular_velocities;
