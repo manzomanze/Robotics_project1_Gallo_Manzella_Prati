@@ -45,17 +45,18 @@ public:
       
     }
 
-    ROS_INFO("Velocity (Rad/min): %f %f %f %f", actual_msg.wheel_info.vel[FL],
+    ROS_INFO("Velocity (Rad/min): %g %g %g %g", actual_msg.wheel_info.vel[FL],
                                                 actual_msg.wheel_info.vel[FR],
                                                 actual_msg.wheel_info.vel[RL],
                                                 actual_msg.wheel_info.vel[RR]);
     
-    ROS_INFO("Tick count: %f %f %f %f", actual_msg.wheel_info.count_ticks[FL],
+    ROS_INFO("Tick count: %g %g %g %g", actual_msg.wheel_info.count_ticks[FL],
                                         actual_msg.wheel_info.count_ticks[FR],
                                         actual_msg.wheel_info.count_ticks[RL],
                                         actual_msg.wheel_info.count_ticks[RR]);
 
-    ROS_INFO(" ");
+    std::cout << std::endl;
+    
     return actual_msg;
   }
 
@@ -63,46 +64,50 @@ public:
   void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
     t_msg actual_msg = createStruct(msg);
     
-    // ROS_INFO("Sequence ID %d", actual_msg.seq);
+    // here we check if it is the first measure
+    // if so, then we just save the actual message without computing anything
+    // it's not a big deale because the first bunch of msgs are just in still position
+    if(isFirstMeasure){
+      prevMsg = actual_msg;
+      isFirstMeasure = 0;
+      ROS_INFO("This was the first message, no delta are computed");
+      return;
+    }
 
-    // int *vel = actual_msg.wheel_info.vel;
-    // ROS_INFO("Velocity [%f],[%f],[%f],[%f]", vel[FRONT_LEFT], vel[FRONT_RIGHT],
-    //                                           vel[REAR_LEFT], vel[REAR_RIGHT]);
-    // // ROS_INFO("ODOMETRY velocity IF IT IS RadPM [%f],[%f],[%f],[%f]",msg->velocity[0]/60*42/(2*3.14),msg->velocity[1]/60*42/(2*3.14),
-    // // msg->velocity[2]/60*42/(2*3.14),msg->velocity[3]/60*42/(2*3.14));
-    // ROS_INFO("ODOMETRY position [%f],[%f],[%f],[%f]",msg->position[0],msg->position[1],msg->position[2],msg->position[3]);
+    // this cycle has the puropose of computing the delta on the number of ticks
+    for (int i = 0; i < N_WHEELS; i++)
+    {
+      deltaPosition[i] = actual_msg.wheel_info.count_ticks[i] - prevMsg.wheel_info.count_ticks[i];
+    }
 
-    // ROS_INFO("TIME from msg %f",msg->header.stamp.toSec());
-    // ROS_INFO("TIME previous msg %f", previousTime);    
+    ROS_INFO("Delta ticks: %f %f %f %f", deltaPosition[FL], deltaPosition[FR],
+                                          deltaPosition[RL], deltaPosition[RR]);
 
-    // deltaTime = msg->header.stamp.toSec()-previousTime;
-    // previousTime = msg->header.stamp.toSec();
-    // ROS_INFO("Delta time sec %f",deltaTime);
+    deltaTime = actual_msg.time - prevMsg.time;
     
-    // for(int arrayposition=0;arrayposition<4;arrayposition++){
-    //   deltaPosition[arrayposition] = msg->position[arrayposition]-tempPosition[arrayposition];
-    //   tempPosition[arrayposition] = msg->position[arrayposition]; 
-    // }
-    // ROS_INFO("DELTA position [%f],[%f],[%f],[%f]",deltaPosition[0],deltaPosition[1],deltaPosition[2],deltaPosition[3]);
-    // ROS_INFO("ANGULAR WHEEL VELOCITY [%f],[%f],[%f],[%f]\n",deltaPosition[0]/deltaTime, deltaPosition[1]/deltaTime,
-    //                                   deltaPosition[2]/deltaTime, deltaPosition[3]/deltaTime);
+    ROS_INFO("Delta time: %f", deltaTime);
+
+    std::cout << std::endl;
+
+    // here the previous message is updated
+    prevMsg = actual_msg;
+
   }
 
   //constructor of the class OdometryCalculator
   OdometryCalculator(){ 
-    tempPosition[0] = 17269.000000;
-    tempPosition[1] = 11412.000000;
-    tempPosition[2] = 15462.000000;
-    tempPosition[3] = 13165.000000;
-    previousTime = ros::Time::now().toSec();
+    
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
     //linear_anglular_velocities = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   }
   
 private:
-  float tempPosition[4];
-  float deltaPosition[4];
-  double deltaTime,previousTime;
+  int isFirstMeasure = 1;
+  
+  t_msg prevMsg;
+
+  double deltaPosition[4];
+  double deltaTime;
 
   ros::NodeHandle n;
   ros::Subscriber sub_encoder_wheel;
