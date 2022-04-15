@@ -4,6 +4,8 @@
 
 #define SEC_IN_MIN 60
 #define N_WHEELS 4
+#define N_WINDOWS 42
+#define RESOLUTION (2*3.14/(4*N_WINDOWS))
 
 enum wheel_order {
   FL,
@@ -87,10 +89,21 @@ public:
     
     ROS_INFO("Delta time: %f", deltaTime);
 
+    double computedVel[N_WHEELS];
+    for (int i = 0; i < N_WHEELS; i++)
+    {
+      double tickPerSec = (deltaPosition[i]/deltaTime);
+      computedVel[i] = tickPerSec * RESOLUTION;
+    }
+
+    ROS_INFO("Computed velocity: %f %f %f %f", computedVel[FL], computedVel[FR],
+                                                computedVel[RL], computedVel[RR]); 
+
     std::cout << std::endl;
 
     // here the previous message is updated
     prevMsg = actual_msg;
+
 
   }
 
