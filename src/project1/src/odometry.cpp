@@ -94,7 +94,13 @@ public:
                                           deltaPosition[RL], deltaPosition[RR]);
 
     ROS_INFO("Computed velocity: %f %f %f %f", computedVel[FL], computedVel[FR],
-                                                computedVel[RL], computedVel[RR]); 
+                                                computedVel[RL], computedVel[RR]);
+
+    // print the velocity given in the bag, it is in Rad/min, so I divide by 60 to get the Rad/s
+    ROS_INFO("Velocity from the bag (Rad/sec): %f %f %f %f", actual_msg.wheel_info.vel[FL]/SEC_IN_MIN/4,
+                                                    actual_msg.wheel_info.vel[FR]/SEC_IN_MIN/4,
+                                                    actual_msg.wheel_info.vel[RL]/SEC_IN_MIN/4,
+                                                    actual_msg.wheel_info.vel[RR]/SEC_IN_MIN/4); 
 
     // here the previous message is updated
     prevMsg = actual_msg;
@@ -115,6 +121,8 @@ public:
 
       ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachFour[FL], deltaPosEachFour[FR],
                                                           deltaPosEachFour[RL], deltaPosEachFour[RR]);
+
+      ROS_INFO("Delta time each four MSGS: %f", deltaTime);
 
       ROS_INFO("Computed velocity each four MSGS: %f %f %f %f", computedVelEachFour[FL], computedVelEachFour[FR],
                                                                 computedVelEachFour[RL], computedVelEachFour[RR]);
