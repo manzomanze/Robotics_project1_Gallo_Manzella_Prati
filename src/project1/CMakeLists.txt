@@ -28,9 +28,6 @@ catkin_package(CATKIN_DEPENDS message_runtime)
 ## Build talker and listener
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-
-
-
 add_executable(odometry src/odometry.cpp)
 add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometry ${catkin_LIBRARIES})
