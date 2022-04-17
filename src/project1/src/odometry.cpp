@@ -10,6 +10,7 @@
 #define X_WHEEL_DISTANCE 0.200
 #define Y_WHEEL_DISTANCE 0.169
 #define RADIUS 0.07
+#define EVERY_N_MSG_TO_DENOISE 4
 
 enum wheel_order {
   FL,
@@ -66,15 +67,15 @@ public:
     return actual_msg;
   }
 
-  void calculateKinematics(double *computedVelEachFour ){
+  void calculateKinematics(double *computedVelEachNmsg ){
     robotLinearVelocityOnX = RADIUS/4*GEAR_RATIO*
-              (computedVelEachFour[FL]+computedVelEachFour[FR]+computedVelEachFour[RL]+computedVelEachFour[RR]);
+              (computedVelEachNmsg[FL]+computedVelEachNmsg[FR]+computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
     robotLinearVelocityOnY = RADIUS/4*GEAR_RATIO*
-              (computedVelEachFour[FL]-computedVelEachFour[FR]-computedVelEachFour[RL]+computedVelEachFour[RR]);
+              (computedVelEachNmsg[FL]-computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
     robotAngularVelocity = RADIUS/4*GEAR_RATIO/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
-              (-computedVelEachFour[FL]+computedVelEachFour[FR]-computedVelEachFour[RL]+computedVelEachFour[RR]);
+              (-computedVelEachNmsg[FL]+computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
     ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
     ROS_INFO("ROBOT LINEAR VELOCITY ON Y %f",robotLinearVelocityOnY);
@@ -90,7 +91,7 @@ public:
     // it's not a big deale because the first bunch of msgs are just in still position
     if(isFirstMeasure){
       prevMsg = actual_msg;
-      prevMsgEachFour = actual_msg;
+      prevMsgEachNmsg = actual_msg;
       isFirstMeasure = 0;
       ROS_INFO("This was the first message, no delta are computed");
       return;
@@ -125,30 +126,30 @@ public:
     prevMsg = actual_msg;
 
     // here I need to check that the four message are passed
-    deltaMsgNumber = actual_msg.seq - prevMsgEachFour.seq;
+    deltaMsgNumber = actual_msg.seq - prevMsgEachNmsg.seq;
     // we enter this if each 4 messages
-    if(deltaMsgNumber == 4){
+    if(deltaMsgNumber == EVERY_N_MSG_TO_DENOISE){
       // now the delta time is performed between msgs that are distant 4 msgs
-      deltaTime = actual_msg.time - prevMsgEachFour.time;
-      double computedVelEachFour[N_WHEELS];
+      deltaTime = actual_msg.time - prevMsgEachNmsg.time;
+      double computedVelEachNmsg[N_WHEELS];
       for (int i = 0; i < N_WHEELS; i++)
       {
-        deltaPosEachFour[i] = actual_msg.wheel_info.count_ticks[i] - prevMsgEachFour.wheel_info.count_ticks[i]; 
-        double tickPerSec = (deltaPosEachFour[i]/deltaTime);
-        computedVelEachFour[i] = tickPerSec * RESOLUTION;
+        deltaPosEachNmsg[i] = actual_msg.wheel_info.count_ticks[i] - prevMsgEachNmsg.wheel_info.count_ticks[i]; 
+        double tickPerSec = (deltaPosEachNmsg[i]/deltaTime);
+        computedVelEachNmsg[i] = tickPerSec * RESOLUTION;
       }
 
-      ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachFour[FL], deltaPosEachFour[FR],
-                                                          deltaPosEachFour[RL], deltaPosEachFour[RR]);
+      ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachNmsg[FL], deltaPosEachNmsg[FR],
+                                                          deltaPosEachNmsg[RL], deltaPosEachNmsg[RR]);
 
       ROS_INFO("Delta time each four MSGS: %f", deltaTime);
 
-      ROS_INFO("Computed velocity each four MSGS: %f %f %f %f", computedVelEachFour[FL], computedVelEachFour[FR],
-                                                                computedVelEachFour[RL], computedVelEachFour[RR]);
+      ROS_INFO("Computed velocity each four MSGS: %f %f %f %f", computedVelEachNmsg[FL], computedVelEachNmsg[FR],
+                                                                computedVelEachNmsg[RL], computedVelEachNmsg[RR]);
       // we reset the message 
-      prevMsgEachFour = actual_msg;
+      prevMsgEachNmsg = actual_msg;
 
-      calculateKinematics(computedVelEachFour);
+      calculateKinematics(computedVelEachNmsg);
     }
 
 
@@ -171,7 +172,7 @@ private:
   t_msg prevMsg;
   // here we use a variable to store the message only after 4 messages
   // the idea is to limit the noise
-  t_msg prevMsgEachFour;
+  t_msg prevMsgEachNmsg;
 
   t_msg actual_msg;
 
@@ -182,7 +183,7 @@ private:
 
   // here we declare the variables used for the computation of the velocity with less noise (hopefully)
   int deltaMsgNumber = 0;
-  double deltaPosEachFour[N_WHEELS];
+  double deltaPosEachNmsg[N_WHEELS];
 
   double robotLinearVelocityOnX;
   double robotLinearVelocityOnY;
