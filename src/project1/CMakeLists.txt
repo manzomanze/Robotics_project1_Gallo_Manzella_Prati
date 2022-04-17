@@ -34,3 +34,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(odometry src/odometry.cpp)
 add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometry ${catkin_LIBRARIES})
+
+add_executable(gt_pose src/gt_pose.cpp)
+add_dependencies(gt_pose ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gt_pose ${catkin_LIBRARIES})

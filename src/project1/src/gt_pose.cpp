@@ -26,12 +26,12 @@ typedef struct {
 
 void printPosition(position_t position) {
     ROS_INFO("POSITION  x: %f, y: %f, z: %f", position.x, position.y, position.z);
-    std::cout << std::endl;
+    
 }
 
 void printOrientation(orientation_t orient) {
     ROS_INFO("ORIENTATION  x: %f, y: %f, z: %f, w: %f", orient.x, orient.y, orient.z, orient.w);
-    std::cout << std::endl;
+    
 }
 
 pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
@@ -64,6 +64,11 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
     pose_t actual_msg = createStruct(msg);
 
+    ROS_INFO("Message number %d arrived", actual_msg.seq);
+    ROS_INFO("Time of the message: %f", actual_msg.time);
+    printPosition(actual_msg.posit);
+    printOrientation(actual_msg.orient);
+    std::cout << std::endl;
 
 
 }
