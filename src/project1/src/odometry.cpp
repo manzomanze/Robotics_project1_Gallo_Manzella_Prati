@@ -6,6 +6,10 @@
 #define N_WHEELS 4
 #define N_WINDOWS 42
 #define RESOLUTION (2*3.14/(4*N_WINDOWS))
+#define GEAR_RATIO 5
+#define X_WHEEL_DISTANCE 0.200
+#define Y_WHEEL_DISTANCE 0.169
+#define RADIUS 0.07
 
 enum wheel_order {
   FL,
@@ -62,9 +66,24 @@ public:
     return actual_msg;
   }
 
+  void calculateKinematics(double *computedVelEachFour ){
+    robotLinearVelocityOnX = RADIUS/4*GEAR_RATIO*
+              (computedVelEachFour[FL]+computedVelEachFour[FR]+computedVelEachFour[RL]+computedVelEachFour[RR]);
+
+    robotLinearVelocityOnY = RADIUS/4*GEAR_RATIO*
+              (computedVelEachFour[FL]-computedVelEachFour[FR]-computedVelEachFour[RL]+computedVelEachFour[RR]);
+
+    robotAngularVelocity = RADIUS/4*GEAR_RATIO/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
+              (-computedVelEachFour[FL]+computedVelEachFour[FR]-computedVelEachFour[RL]+computedVelEachFour[RR]);
+
+    ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
+    ROS_INFO("ROBOT LINEAR VELOCITY ON Y %f",robotLinearVelocityOnY);
+    ROS_INFO("ROBOT ANGULAR VELOCITY %f",robotAngularVelocity);
+  }
+
   //callback called each time a message on topic /wheel_states is published by the bag
   void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
-    t_msg actual_msg = createStruct(msg);
+    actual_msg = createStruct(msg);
     
     // here we check if it is the first measure
     // if so, then we just save the actual message without computing anything
@@ -128,6 +147,8 @@ public:
                                                                 computedVelEachFour[RL], computedVelEachFour[RR]);
       // we reset the message 
       prevMsgEachFour = actual_msg;
+
+      calculateKinematics(computedVelEachFour);
     }
 
 
@@ -137,7 +158,9 @@ public:
 
   //constructor of the class OdometryCalculator
   OdometryCalculator(){ 
-    
+    robotLinearVelocityOnX = 0;
+    robotLinearVelocityOnY = 0;
+    robotAngularVelocity = 0;
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
     //linear_anglular_velocities = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   }
@@ -150,12 +173,20 @@ private:
   // the idea is to limit the noise
   t_msg prevMsgEachFour;
 
+  t_msg actual_msg;
+
+
+
   double deltaPosition[N_WHEELS];
   double deltaTime;
 
   // here we declare the variables used for the computation of the velocity with less noise (hopefully)
   int deltaMsgNumber = 0;
   double deltaPosEachFour[N_WHEELS];
+
+  double robotLinearVelocityOnX;
+  double robotLinearVelocityOnY;
+  double robotAngularVelocity;
   
   ros::NodeHandle n;
   ros::Subscriber sub_encoder_wheel;
