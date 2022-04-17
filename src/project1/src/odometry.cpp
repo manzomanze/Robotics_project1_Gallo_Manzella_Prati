@@ -10,7 +10,7 @@
 #define X_WHEEL_DISTANCE 0.200
 #define Y_WHEEL_DISTANCE 0.169
 #define RADIUS 0.07
-#define EVERY_N_MSG_TO_DENOISE 4
+#define EVERY_N_MSG_TO_DENOISE 6
 
 enum wheel_order {
   FL,
