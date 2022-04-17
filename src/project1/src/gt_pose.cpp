@@ -4,18 +4,17 @@
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
 typedef struct {
-    int x;
-    int y;
-    int z;
+    double x;
+    double y;
+    double z;
 } position_t;
 
 typedef struct {
-    int x;
-    int y;
-    int z;
-    int w;
+    double x;
+    double y;
+    double z;
+    double w;
 } orientation_t;
-
 
 typedef struct {
     uint32_t seq;
@@ -23,9 +22,47 @@ typedef struct {
 
     position_t posit;
     orientation_t orient;  
-} t_pose;
+} pose_t;
 
+void printPosition(position_t position) {
+    ROS_INFO("POSITION  x: %f, y: %f, z: %f", position.x, position.y, position.z);
+    std::cout << std::endl;
+}
+
+void printOrientation(orientation_t orient) {
+    ROS_INFO("ORIENTATION  x: %f, y: %f, z: %f, w: %f", orient.x, orient.y, orient.z, orient.w);
+    std::cout << std::endl;
+}
+
+pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
+    pose_t p;
+    
+    p.seq = msg -> header.seq;
+    p.time = msg -> header.stamp.toSec();
+    
+    p.posit.x = msg -> pose.position.x;
+    p.posit.y = msg -> pose.position.y;
+    p.posit.z = msg -> pose.position.z;
+
+    p.orient.x = msg -> pose.orientation.x;
+    p.orient.y = msg -> pose.orientation.y;
+    p.orient.z = msg -> pose.orientation.z;
+    p.orient.w = msg -> pose.orientation.w;
+    
+    return p;
+
+}
+
+
+/**
+ * @brief This is the function we use to print out
+ * the pose retrieved by the topic /robot/pose
+ * 
+ * @param msg 
+ */
 void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
+
+    pose_t actual_msg = createStruct(msg);
 
 
 
