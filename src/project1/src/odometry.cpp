@@ -144,7 +144,7 @@ public:
 
       ROS_INFO("Delta time each four MSGS: %f", deltaTime);
 
-      ROS_INFO("Computed velocity each four MSGS: %f %f %f %f", computedVelEachNmsg[FL], computedVelEachNmsg[FR],
+      ROS_INFO("Computed velocity each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, computedVelEachNmsg[FL], computedVelEachNmsg[FR],
                                                                 computedVelEachNmsg[RL], computedVelEachNmsg[RR]);
       // we reset the message 
       prevMsgEachNmsg = actual_msg;
