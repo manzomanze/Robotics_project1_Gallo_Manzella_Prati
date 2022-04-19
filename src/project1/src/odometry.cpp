@@ -164,7 +164,7 @@ private:
 
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "listener");
+  ros::init(argc, argv, "speed_calculator");
   //odom object of class OdometryCalcualtor
   OdometryCalculator odom;
 

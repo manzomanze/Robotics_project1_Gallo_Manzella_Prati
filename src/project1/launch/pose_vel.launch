@@ -1,0 +1,6 @@
+<launch>
+
+    <node pkg="project1" type="odometry" name="speed_calculator" output="screen" />
+    <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
+
+</launch>
