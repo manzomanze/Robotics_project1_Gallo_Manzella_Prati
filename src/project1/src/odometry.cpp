@@ -52,6 +52,30 @@ public:
     return actual_msg;
   }
 
+  geometry_msgs::TwistStamped publishMsg_cmd_vel(double linear_x, double linear_y, double angular_z){
+    /* generate geometry_msgs::TwistStamped msg containing the linear velocity 
+    on x and  y and the angular velocity around the z axis */
+    geometry_msgs::TwistStamped cmd_vel_msg;
+    
+    
+    cmd_vel_msg.header.frame_id = "robot_frame";
+    cmd_vel_msg.header.stamp = ros::Time::now();
+    
+    cmd_vel_msg.twist.linear.x = linear_x;
+    cmd_vel_msg.twist.linear.y = linear_y;
+    cmd_vel_msg.twist.linear.z = 0.0;
+
+    cmd_vel_msg.twist.angular.x = 0.0;
+    cmd_vel_msg.twist.angular.y = 0.0;
+    cmd_vel_msg.twist.angular.z = angular_z;
+
+
+    // print count to screen
+    // publish messages
+    cmd_vel_publisher.publish(cmd_vel_msg);
+    return cmd_vel_msg;
+  }
+
   void calculateKinematics(double *computedVelEachNmsg ){
     robotLinearVelocityOnX = RADIUS/4*GEAR_RATIO*
               (computedVelEachNmsg[FL]+computedVelEachNmsg[FR]+computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
@@ -65,7 +89,7 @@ public:
     ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
     ROS_INFO("ROBOT LINEAR VELOCITY ON Y %f",robotLinearVelocityOnY);
     ROS_INFO("ROBOT ANGULAR VELOCITY %f",robotAngularVelocity);
-
+    publishMsg_cmd_vel(robotLinearVelocityOnX,robotLinearVelocityOnY,robotAngularVelocity);
     std::cout << std::endl;
   }
 
@@ -135,8 +159,8 @@ public:
     robotLinearVelocityOnX = 0;
     robotLinearVelocityOnY = 0;
     robotAngularVelocity = 0;
+    cmd_vel_publisher = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);    
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
-    //linear_anglular_velocities = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   }
   
 private:
@@ -159,7 +183,7 @@ private:
   
   ros::NodeHandle n;
   ros::Subscriber sub_encoder_wheel;
-  ros::Publisher linear_angular_velocities;
+  ros::Publisher cmd_vel_publisher;
 };
 
 
