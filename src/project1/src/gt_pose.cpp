@@ -1,6 +1,5 @@
 #include <ros/ros.h>
 #include "geometry_msgs/PoseStamped.h"
-#include <project1/parametersConfig.h>
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
