@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include "geometry_msgs/PoseStamped.h"
+#include "project1/parametersConfig.h"
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
@@ -70,6 +71,7 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
     // enter this if at the first msg received, so that we set get the initial pose
     if(isFirstMsg){
         
+        // * Here we can set the initial_pose dynamically
         
     }
 
@@ -104,7 +106,6 @@ int main(int argc, char * argv[])
 {
     ros::init(argc, argv, "ground_truth_listener");
     
-
     PoseClass p;
 
     ros::spin();
