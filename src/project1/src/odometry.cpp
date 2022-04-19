@@ -75,6 +75,12 @@ public:
     cmd_vel_publisher.publish(cmd_vel_msg);
     return cmd_vel_msg;
   }
+  void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
+      robot_x += (linear_x* cos(robot_theta)+linear_y * sin(robot_theta))*samplingTime ;
+      robot_y += (linear_x* sin(robot_theta)+linear_y * cos(robot_theta))*samplingTime;
+      robot_theta += angular_z * samplingTime;
+      ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
+  }
 
   void calculateKinematics(double *computedVelEachNmsg ){
     robotLinearVelocityOnX = RADIUS/4*GEAR_RATIO*
@@ -150,6 +156,9 @@ public:
       prevMsgEachNmsg = actual_msg;
 
       calculateKinematics(computedVelEachNmsg);
+
+      calculateEulerIntegration(robotLinearVelocityOnX,robotLinearVelocityOnY,robotAngularVelocity,deltaTime);
+
     }
 
   }
@@ -159,6 +168,9 @@ public:
     robotLinearVelocityOnX = 0;
     robotLinearVelocityOnY = 0;
     robotAngularVelocity = 0;
+    robot_x = 0.0;
+    robot_y = 0.0;
+    robot_theta = 0.0;
     cmd_vel_publisher = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);    
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
   }
@@ -172,6 +184,10 @@ private:
   t_msg actual_msg, prevMsgEachNmsg;
 
   double deltaTime;
+
+  double robot_x;
+  double robot_y;
+  double robot_theta;
 
   // here we declare the variables used for the computation of the velocity with less noise (hopefully)
   int deltaMsgNumber = 0;
