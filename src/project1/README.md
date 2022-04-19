@@ -1,5 +1,20 @@
 # Project 1
 
+## Goals
+1. Compute odometry using appropriate kinematics:
+    - Compute robot linear and angular velocities v, ⍵ from wheel encoders
+    - Compute odometry using both Euler and Runge-Kutta integration (using *ROS parameter for initial pose*)
+    - Calibrate (fine-tune) robot parameters to match ground truth
+2. Compute wheel control speeds from v, ⍵
+3. Add a service to reset the odometry to a specified pose (x,y,θ)
+4. Use dynamic reconfigure to select between integration method
+
+### Compute odometry
+Write down the formula to compute v and ⍵, adapt the forumla to use the ticks in the bag, which are less noisy. Compute a rough estimate of v and ⍵ and publish them on topic **cmd_vel** of type *geometry_msgs/TwistStamped*. <br>
+Now that we have the velocities, we need to compute the odometry. We use the Euler integration at first and then Runge-Kutta as well.
+
+We add ROS parameters for the initial pose (x, y, ϑ).
+
 ## Here we have to look inside three bags in order to perform odometry of the robot
 
 The only topic we are insterested in is: /wheel_states
