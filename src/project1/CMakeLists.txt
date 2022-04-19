@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  dynamic_reconfigure
 )
 
 ## Add custom message and its dependencies
@@ -21,6 +22,10 @@ generate_messages(
    DEPENDENCIES
    std_msgs
  )
+
+generate_dynamic_reconfigure_options(
+  cfg/parameters.cfg
+)
 
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS message_runtime)
