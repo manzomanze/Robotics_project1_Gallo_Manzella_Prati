@@ -1,6 +1,9 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h" //message type of encoder from bag
 #include "geometry_msgs/TwistStamped.h" //message type for linear and angular velocities
+#include "nav_msgs/Odometry.h"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 
 #define SEC_IN_MIN 60
 #define N_WHEELS 4
@@ -75,6 +78,28 @@ public:
     cmd_vel_publisher.publish(cmd_vel_msg);
     return cmd_vel_msg;
   }
+
+  void publishMsg_odom(double robot_x, double robot_y, double robot_theta){
+    /* generate nav_msgs::Odometry msg containing the position 
+    on x and  y and the angular position around the z axis */
+    nav_msgs::Odometry odom_msg;
+    
+    
+    odom_msg.header.frame_id = "robot_frame";
+    odom_msg.header.stamp = ros::Time::now();
+    
+    odom_msg.pose.pose.position.x = robot_x;
+    odom_msg.pose.pose.position.y = robot_y;
+    tf2::Quaternion quat_tf;
+    geometry_msgs::Quaternion quat_msg;
+    // Create this quaternion from roll/pitch/yaw (in radians)
+    quat_tf.setRPY( 0, 0,  robot_theta); //to transform in radians if not in radians
+    tf2::convert(quat_tf,quat_msg);
+    odom_msg.pose.pose.orientation = quat_msg;
+    // print count to screen
+    // publish messages
+    odom_publisher.publish(odom_msg);
+  }
   void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
       robot_x += (linear_x* cos(robot_theta)+linear_y * sin(robot_theta))*samplingTime ;
       robot_y += (linear_x* sin(robot_theta)+linear_y * cos(robot_theta))*samplingTime;
@@ -82,6 +107,9 @@ public:
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
   }
 
+  /*
+    Calculates the 
+  */
   void calculateKinematics(double *computedVelEachNmsg ){
     robotLinearVelocityOnX = RADIUS/4*GEAR_RATIO*
               (computedVelEachNmsg[FL]+computedVelEachNmsg[FR]+computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
@@ -96,6 +124,7 @@ public:
     ROS_INFO("ROBOT LINEAR VELOCITY ON Y %f",robotLinearVelocityOnY);
     ROS_INFO("ROBOT ANGULAR VELOCITY %f",robotAngularVelocity);
     publishMsg_cmd_vel(robotLinearVelocityOnX,robotLinearVelocityOnY,robotAngularVelocity);
+    publishMsg_odom(robot_x,robot_y,robot_theta);
     std::cout << std::endl;
   }
 
@@ -172,6 +201,7 @@ public:
     robot_y = 0.0;
     robot_theta = 0.0;
     cmd_vel_publisher = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);    
+    odom_publisher = n.advertise<nav_msgs::Odometry>("/odom", 1000); 
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
   }
   
@@ -200,6 +230,7 @@ private:
   ros::NodeHandle n;
   ros::Subscriber sub_encoder_wheel;
   ros::Publisher cmd_vel_publisher;
+  ros::Publisher odom_publisher;
 };
 
 
