@@ -54,6 +54,9 @@ pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
 }
 
 
+
+class PoseClass {
+
 /**
  * @brief This is the function we use to print out
  * the pose retrieved by the topic /robot/pose
@@ -64,6 +67,7 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
     pose_t actual_msg = createStruct(msg);
 
+
     ROS_INFO("Message number %d arrived", actual_msg.seq);
     ROS_INFO("Time of the message: %f", actual_msg.time);
     printPosition(actual_msg.posit);
@@ -73,12 +77,10 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
 }
 
-class poseClass {
-
 public:
 
-    poseClass() {
-        subPose = nh.subscribe("robot/pose", 1000, poseCallBack);
+    PoseClass() {
+        subPose = nh.subscribe("robot/pose", 1000, &PoseClass::poseCallBack, this);
     }
 
 
@@ -96,7 +98,7 @@ int main(int argc, char * argv[])
 {
     ros::init(argc, argv, "ground_truth_listener");
     
-    poseClass posClass;
+    PoseClass p;
 
     ros::spin();
 
