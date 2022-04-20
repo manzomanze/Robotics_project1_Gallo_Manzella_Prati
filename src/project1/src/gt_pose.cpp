@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include "geometry_msgs/PoseStamped.h"
 #include "project1/parametersConfig.h"
+#include <dynamic_reconfigure/server.h>
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
@@ -100,12 +101,28 @@ private:
 
 };
 
+void param_callback(double* xPos, double* yPos, double* zPos,
+                    double* xOrient, double* yOrient, double* zOrient, double* wOrient,
+                    project1::parametersConfig &config, uint32_t level){
 
+    
+    ROS_INFO("Reconfigure request, new values are:");
+
+}
 
 int main(int argc, char * argv[])
 {
     ros::init(argc, argv, "ground_truth_listener");
+
+    pose_t initPose;
     
+    dynamic_reconfigure::Server<project1::parametersConfig> dynServ;
+    dynamic_reconfigure::Server<project1::parametersConfig>::CallbackType f;
+
+    f = boost::bind(&param_callback, &initPose.posit.x, &initPose.posit.y, &initPose.posit.z, 
+                                    &initPose.orient.x, &initPose.orient.y,&initPose.orient.z, &initPose.orient.w, _1, _2); 
+    dynServ.setCallback(f);
+
     PoseClass p;
 
     ros::spin();
