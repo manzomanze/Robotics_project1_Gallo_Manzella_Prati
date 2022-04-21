@@ -8,12 +8,12 @@
 #define SEC_IN_MIN 60
 #define N_WHEELS 4
 #define N_WINDOWS 42
-#define RESOLUTION (2*3.14/(4*N_WINDOWS))
+#define RESOLUTION (2*3.14/(N_WINDOWS))
 #define GEAR_RATIO 5
 #define X_WHEEL_DISTANCE 0.200
 #define Y_WHEEL_DISTANCE 0.169
 #define RADIUS 0.07
-#define EVERY_N_MSG_TO_DENOISE 6
+#define EVERY_N_MSG_TO_DENOISE 3
 
 enum wheel_order {
   FL,
@@ -45,9 +45,9 @@ public:
     
     actual_msg.time = msg -> header.stamp.toSec();
     
-    for (int i = 0; i < N_WHEELS; i++)
-    {
-      actual_msg.wheel_info.vel[i] = msg -> velocity[i];
+    for (int i = 0; i < N_WHEELS; i++) {
+      // ? remember the velocity is in rad/min and it's measured at the motor, not the wheel
+      actual_msg.wheel_info.vel[i] = (msg -> velocity[i]) / (SEC_IN_MIN * GEAR_RATIO);
       actual_msg.wheel_info.count_ticks[i] = msg -> position[i];
       
     }
@@ -87,7 +87,7 @@ public:
 
       ROS_INFO("Message sequence: %d", actual_msg.seq);
       ROS_INFO("Time stamp: %f", actual_msg.time);
-      ROS_INFO("Velocity (Rad/min): %g %g %g %g", actual_msg.wheel_info.vel[FL],
+      ROS_INFO("Velocity (Rad/s): %g %g %g %g", actual_msg.wheel_info.vel[FL],
                                                 actual_msg.wheel_info.vel[FR],
                                                 actual_msg.wheel_info.vel[RL],
                                                 actual_msg.wheel_info.vel[RR]);
@@ -97,10 +97,9 @@ public:
                                         actual_msg.wheel_info.count_ticks[RL],
                                         actual_msg.wheel_info.count_ticks[RR]);
 
-      ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachNmsg[FL], deltaPosEachNmsg[FR],
-                                                          deltaPosEachNmsg[RL], deltaPosEachNmsg[RR]);
-
-      ROS_INFO("Delta time each four MSGS: %f", deltaTime);
+      ROS_INFO("Delta ticks each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, deltaPosEachNmsg[FL], deltaPosEachNmsg[FR],
+                                                       deltaPosEachNmsg[RL], deltaPosEachNmsg[RR]);
+    ROS_INFO("Delta time each %d MSGS: %f", EVERY_N_MSG_TO_DENOISE, deltaTime);
 
       ROS_INFO("Computed velocity each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, computedVelEachNmsg[FL], computedVelEachNmsg[FR],
                                                                 computedVelEachNmsg[RL], computedVelEachNmsg[RR]);
