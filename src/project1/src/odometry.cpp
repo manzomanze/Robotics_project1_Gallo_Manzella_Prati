@@ -62,7 +62,7 @@ public:
     
     
     cmd_vel_msg.header.frame_id = "robot_frame";
-    cmd_vel_msg.header.stamp = ros::Time::now();
+    cmd_vel_msg.header.stamp = ros::Time::now(); // ? non convien mettere il timestamp dell'ultimo messaggio ricevuto?
     
     cmd_vel_msg.twist.linear.x = linear_x;
     cmd_vel_msg.twist.linear.y = linear_y;
