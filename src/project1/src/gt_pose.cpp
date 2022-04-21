@@ -82,6 +82,7 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
         ros::param::set("/ground_truth_listener/zOrient", actual_msg.orient.z);
         ros::param::set("/ground_truth_listener/wOrient", actual_msg.orient.w);
 
+        isFirstMsg = false;
     }
 
     ROS_INFO("Message number %d arrived", actual_msg.seq);
