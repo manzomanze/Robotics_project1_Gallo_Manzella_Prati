@@ -55,6 +55,68 @@ public:
     return actual_msg;
   }
 
+
+  //callback called each time a message on topic /wheel_states is published by the bag
+  void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
+    actual_msg = createStruct(msg);
+    
+    // here we check if it is the first measure
+    // if so, then we just save the actual message without computing anything
+    // it's not a big deale because the first bunch of msgs are just in still position
+    if(isFirstMeasure){
+      prevMsgEachNmsg = actual_msg;
+      isFirstMeasure = 0;
+      ROS_INFO("This was the first message, no delta are computed");
+      return;
+    }
+
+    // here I need to check that the four message are passed
+    deltaMsgNumber = actual_msg.seq - prevMsgEachNmsg.seq;
+    // we enter this if each N messages
+    if(deltaMsgNumber == EVERY_N_MSG_TO_DENOISE){
+      
+      // now the delta time is performed between msgs that are distant 4 msgs
+      deltaTime = actual_msg.time - prevMsgEachNmsg.time;
+      double computedVelEachNmsg[N_WHEELS];
+      for (int i = 0; i < N_WHEELS; i++)
+      {
+        deltaPosEachNmsg[i] = actual_msg.wheel_info.count_ticks[i] - prevMsgEachNmsg.wheel_info.count_ticks[i]; 
+        double tickPerSec = (deltaPosEachNmsg[i]/deltaTime);
+        computedVelEachNmsg[i] = tickPerSec * RESOLUTION / GEAR_RATIO; // ? should it be divided per gear ration? I think so
+      }
+
+      ROS_INFO("Message sequence: %d", actual_msg.seq);
+      ROS_INFO("Time stamp: %f", actual_msg.time);
+      ROS_INFO("Velocity (Rad/min): %g %g %g %g", actual_msg.wheel_info.vel[FL],
+                                                actual_msg.wheel_info.vel[FR],
+                                                actual_msg.wheel_info.vel[RL],
+                                                actual_msg.wheel_info.vel[RR]);
+    
+      ROS_INFO("Tick count: %g %g %g %g", actual_msg.wheel_info.count_ticks[FL],
+                                        actual_msg.wheel_info.count_ticks[FR],
+                                        actual_msg.wheel_info.count_ticks[RL],
+                                        actual_msg.wheel_info.count_ticks[RR]);
+
+      ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachNmsg[FL], deltaPosEachNmsg[FR],
+                                                          deltaPosEachNmsg[RL], deltaPosEachNmsg[RR]);
+
+      ROS_INFO("Delta time each four MSGS: %f", deltaTime);
+
+      ROS_INFO("Computed velocity each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, computedVelEachNmsg[FL], computedVelEachNmsg[FR],
+                                                                computedVelEachNmsg[RL], computedVelEachNmsg[RR]);
+      std::cout << std::endl;
+
+      // we reset the message 
+      prevMsgEachNmsg = actual_msg;
+
+      calculateKinematics(computedVelEachNmsg);
+
+      calculateEulerIntegration(robotLinearVelocityOnX, robotLinearVelocityOnY, robotAngularVelocity, deltaTime);
+
+    }
+
+  }
+
   geometry_msgs::TwistStamped publishMsg_cmd_vel(double linear_x, double linear_y, double angular_z){
     /* generate geometry_msgs::TwistStamped msg containing the linear velocity 
     on x and  y and the angular velocity around the z axis */
@@ -101,7 +163,9 @@ public:
     odom_publisher.publish(odom_msg);
   }
   void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
-      robot_x += (linear_x* cos(robot_theta)+linear_y * sin(robot_theta))*samplingTime ;
+      double vel_k = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta));
+      
+      robot_x += vel_k *samplingTime * cos(robot_theta) ;
       robot_y += (linear_x* sin(robot_theta)+linear_y * cos(robot_theta))*samplingTime;
       robot_theta += angular_z * samplingTime;
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
@@ -111,13 +175,13 @@ public:
     Calculates the 
   */
   void calculateKinematics(double *computedVelEachNmsg ){
-    robotLinearVelocityOnX = RADIUS/4*GEAR_RATIO*
+    robotLinearVelocityOnX = RADIUS/(4)*
               (computedVelEachNmsg[FL]+computedVelEachNmsg[FR]+computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
-    robotLinearVelocityOnY = RADIUS/4*GEAR_RATIO*
+    robotLinearVelocityOnY = RADIUS/(4)*
               (computedVelEachNmsg[FL]-computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
-    robotAngularVelocity = RADIUS/4*GEAR_RATIO/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
+    robotAngularVelocity = RADIUS/(4)/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
               (-computedVelEachNmsg[FL]+computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
     ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
@@ -126,70 +190,6 @@ public:
     publishMsg_cmd_vel(robotLinearVelocityOnX,robotLinearVelocityOnY,robotAngularVelocity);
     publishMsg_odom(robot_x,robot_y,robot_theta);
     std::cout << std::endl;
-  }
-
-  //callback called each time a message on topic /wheel_states is published by the bag
-  void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
-    actual_msg = createStruct(msg);
-    
-    // here we check if it is the first measure
-    // if so, then we just save the actual message without computing anything
-    // it's not a big deale because the first bunch of msgs are just in still position
-    if(isFirstMeasure){
-      prevMsgEachNmsg = actual_msg;
-      isFirstMeasure = 0;
-      ROS_INFO("This was the first message, no delta are computed");
-      return;
-    }
-
-    // here I need to check that the four message are passed
-    deltaMsgNumber = actual_msg.seq - prevMsgEachNmsg.seq;
-    // we enter this if each N messages
-    if(deltaMsgNumber == EVERY_N_MSG_TO_DENOISE){
-      
-
-      
-      // now the delta time is performed between msgs that are distant 4 msgs
-      deltaTime = actual_msg.time - prevMsgEachNmsg.time;
-      double computedVelEachNmsg[N_WHEELS];
-      for (int i = 0; i < N_WHEELS; i++)
-      {
-        deltaPosEachNmsg[i] = actual_msg.wheel_info.count_ticks[i] - prevMsgEachNmsg.wheel_info.count_ticks[i]; 
-        double tickPerSec = (deltaPosEachNmsg[i]/deltaTime);
-        computedVelEachNmsg[i] = tickPerSec * RESOLUTION;
-      }
-
-      ROS_INFO("Message sequence: %d", actual_msg.seq);
-      ROS_INFO("Time stamp: %f", actual_msg.time);
-      ROS_INFO("Velocity (Rad/min): %g %g %g %g", actual_msg.wheel_info.vel[FL],
-                                                actual_msg.wheel_info.vel[FR],
-                                                actual_msg.wheel_info.vel[RL],
-                                                actual_msg.wheel_info.vel[RR]);
-    
-      ROS_INFO("Tick count: %g %g %g %g", actual_msg.wheel_info.count_ticks[FL],
-                                        actual_msg.wheel_info.count_ticks[FR],
-                                        actual_msg.wheel_info.count_ticks[RL],
-                                        actual_msg.wheel_info.count_ticks[RR]);
-
-      ROS_INFO("Delta ticks each four MSGS: %f %f %f %f", deltaPosEachNmsg[FL], deltaPosEachNmsg[FR],
-                                                          deltaPosEachNmsg[RL], deltaPosEachNmsg[RR]);
-
-      ROS_INFO("Delta time each four MSGS: %f", deltaTime);
-
-      ROS_INFO("Computed velocity each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, computedVelEachNmsg[FL], computedVelEachNmsg[FR],
-                                                                computedVelEachNmsg[RL], computedVelEachNmsg[RR]);
-      std::cout << std::endl;
-
-      
-      // we reset the message 
-      prevMsgEachNmsg = actual_msg;
-
-      calculateKinematics(computedVelEachNmsg);
-
-      calculateEulerIntegration(robotLinearVelocityOnX,robotLinearVelocityOnY,robotAngularVelocity,deltaTime);
-
-    }
-
   }
 
   //constructor of the class OdometryCalculator
