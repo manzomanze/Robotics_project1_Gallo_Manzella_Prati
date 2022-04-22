@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  dynamic_reconfigure
 )
 
 ## Add custom message and its dependencies
@@ -22,6 +23,10 @@ generate_messages(
    std_msgs
  )
 
+generate_dynamic_reconfigure_options(
+  cfg/parameters.cfg
+) 
+
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS message_runtime)
 
@@ -34,3 +39,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(odometry src/odometry.cpp)
 add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometry ${catkin_LIBRARIES})
+
+add_executable(gt_pose src/gt_pose.cpp)
+add_dependencies(gt_pose ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gt_pose ${catkin_LIBRARIES})

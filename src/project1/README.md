@@ -15,6 +15,8 @@ Now that we have the velocities, we need to compute the odometry. We use the Eul
 
 We add ROS parameters for the initial pose (x, y, ϑ).
 
+---
+
 ## Here we have to look inside three bags in order to perform odometry of the robot
 
 The only topic we are insterested in is: /wheel_states
@@ -69,4 +71,9 @@ rostopic echo /publisher
 When we want to let **Catkin compile the new node** added, meaning the file _.cpp_ in src, we must append to the file CMakeLists.txt
 ```
 add_executable(subscriber src/sub.cpp) target_link_libraries(subscriber ${catkin_LIBRARIES})
+```
+
+To run the reconfigure rqt interface:
+```
+rosrun rqt_reconfigure rqt_reconfigure
 ```
