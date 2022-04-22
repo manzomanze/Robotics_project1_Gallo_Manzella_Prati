@@ -56,7 +56,7 @@ public:
   }
 
 
-  //callback called each time a message on topic /wheel_states is published by the bag
+  //  Callback called each time a message on topic /wheel_states is published by the bag
   void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
     actual_msg = createStruct(msg);
     
@@ -125,7 +125,7 @@ public:
 
       ROS_INFO("Delta ticks each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, deltaPosEachNmsg[FL], deltaPosEachNmsg[FR],
                                                        deltaPosEachNmsg[RL], deltaPosEachNmsg[RR]);
-    ROS_INFO("Delta time each %d MSGS: %f", EVERY_N_MSG_TO_DENOISE, deltaTime);
+      ROS_INFO("Delta time each %d MSGS: %f", EVERY_N_MSG_TO_DENOISE, deltaTime);
 
       ROS_INFO("Computed velocity each %d MSGS: %f %f %f %f", EVERY_N_MSG_TO_DENOISE, computedVelEachNmsg[FL], computedVelEachNmsg[FR],
                                                                 computedVelEachNmsg[RL], computedVelEachNmsg[RR]);
@@ -136,13 +136,13 @@ public:
 
       calculateKinematics(computedVelEachNmsg);
 
-      calculateEulerIntegration(robotLinearVelocityOnX, robotLinearVelocityOnY, robotAngularVelocity, deltaTime);
+      calculateRungeKuttaIntegration(robotLinearVelocityOnX, robotLinearVelocityOnY, robotAngularVelocity, deltaTime);
 
     }
 
   }
 
-  geometry_msgs::TwistStamped publishMsg_cmd_vel(double linear_x, double linear_y, double angular_z){
+  void publishMsg_cmd_vel(double linear_x, double linear_y, double angular_z){
     /* generate geometry_msgs::TwistStamped msg containing the linear velocity 
     on x and  y and the angular velocity around the z axis */
     geometry_msgs::TwistStamped cmd_vel_msg;
@@ -163,7 +163,7 @@ public:
     // print count to screen
     // publish messages
     cmd_vel_publisher.publish(cmd_vel_msg);
-    return cmd_vel_msg;
+    
   }
 
   void publishMsg_odom(double robot_x, double robot_y, double robot_theta){

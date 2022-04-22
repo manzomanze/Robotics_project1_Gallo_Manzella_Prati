@@ -36,6 +36,7 @@ void printOrientation(orientation_t orient) {
     
 }
 
+//  Setter of the struct pose
 pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
     pose_t p;
     
@@ -56,8 +57,9 @@ pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
 }
 
 
-
-class PoseClass {
+// POSE CLASS:
+// This class manages the retrieval of pose info from the ground truth;
+class PoseClass { 
 
 /**
  * @brief This is the function we use to print out
@@ -95,7 +97,7 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 }
 
 public:
-
+    // The class subscribes to the ground truth  topic /robot/pose
     PoseClass() {
         subPose = nh.subscribe("robot/pose", 1000, &PoseClass::poseCallBack, this);
     }
