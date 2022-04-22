@@ -67,6 +67,32 @@ public:
       prevMsgEachNmsg = actual_msg;
       isFirstMeasure = 0;
       ROS_INFO("This was the first message, no delta are computed");
+      
+      tf2Scalar x = -0.011577633209526539;
+      tf2Scalar y = -0.02075166068971157;
+      tf2Scalar z = -0.019595127552747726;
+      tf2Scalar w =  0.9995256066322327;
+
+      robot_x = 0.00815962441265583;
+      robot_y = 0.0030597213190048933;
+      
+      // tf2::Quaternion quat_tf = tf2::Quaternion( &x, &y, &z, &w);
+      tf2::Quaternion quat_tf(x,y,z,w);
+      // quat_tf.setX(x);
+      // quat_tf.setY(y);
+      // quat_tf.setZ(z);
+      // quat_tf.setW(w);
+
+      tf2::Matrix3x3 mat(quat_tf);
+      tf2Scalar yaw, pitch, roll;
+      mat.getEulerYPR(yaw, pitch, roll);
+      
+      ROS_INFO("INITIAL ORIENTATION  yaw: %f; pitch: %f; roll: %f", yaw, pitch, roll);
+
+      robot_theta = yaw;
+
+      // mat.getEulerYPR()       
+
       return;
     }
 
@@ -153,6 +179,7 @@ public:
     odom_msg.pose.pose.position.y = robot_y;
     tf2::Quaternion quat_tf;
     geometry_msgs::Quaternion quat_msg;
+    
     // Create this quaternion from roll/pitch/yaw (in radians)
     quat_tf.setRPY( 0, 0,  robot_theta); //to transform in radians if not in radians
     tf2::convert(quat_tf,quat_msg);
@@ -162,10 +189,12 @@ public:
     odom_publisher.publish(odom_msg);
   }
   void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
-      double vel_k = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta));
+      double vel_kx = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta));
+      robot_x += vel_kx *samplingTime * cos(robot_theta) ;
+
+      double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta));
+      robot_y += vel_ky*samplingTime;
       
-      robot_x += vel_k *samplingTime * cos(robot_theta) ;
-      robot_y += (linear_x* sin(robot_theta)+linear_y * cos(robot_theta))*samplingTime;
       robot_theta += angular_z * samplingTime;
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
   }
@@ -174,13 +203,13 @@ public:
     Calculates the 
   */
   void calculateKinematics(double *computedVelEachNmsg ){
-    robotLinearVelocityOnX = RADIUS/(4)*
+    robotLinearVelocityOnX = RADIUS/4*
               (computedVelEachNmsg[FL]+computedVelEachNmsg[FR]+computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
-    robotLinearVelocityOnY = RADIUS/(4)*
-              (computedVelEachNmsg[FL]-computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
+    robotLinearVelocityOnY = RADIUS/4*
+              (-computedVelEachNmsg[FL]+computedVelEachNmsg[FR]+computedVelEachNmsg[RL]-computedVelEachNmsg[RR]);
 
-    robotAngularVelocity = RADIUS/(4)/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
+    robotAngularVelocity = (RADIUS/4)/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
               (-computedVelEachNmsg[FL]+computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
 
     ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
@@ -196,9 +225,9 @@ public:
     robotLinearVelocityOnX = 0;
     robotLinearVelocityOnY = 0;
     robotAngularVelocity = 0;
-    robot_x = 0.0;
-    robot_y = 0.0;
-    robot_theta = 0.0;
+    // robot_x = 0.0;
+    // robot_y = 0.0;
+    // robot_theta = 0.0;
     cmd_vel_publisher = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);    
     odom_publisher = n.advertise<nav_msgs::Odometry>("/odom", 1000); 
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
