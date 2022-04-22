@@ -3,6 +3,8 @@
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
 
+#define DEBUG 1
+
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
 typedef struct {
@@ -86,12 +88,14 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
         isFirstMsg = false;
     }
+    if(DEBUG){
+        ROS_INFO("Message number %d arrived", actual_msg.seq);
+        ROS_INFO("Time of the message: %f", actual_msg.time);
+        printPosition(actual_msg.posit);
+        printOrientation(actual_msg.orient);
+        std::cout << std::endl;
 
-    ROS_INFO("Message number %d arrived", actual_msg.seq);
-    ROS_INFO("Time of the message: %f", actual_msg.time);
-    printPosition(actual_msg.posit);
-    printOrientation(actual_msg.orient);
-    std::cout << std::endl;
+    }
 
 
 }
