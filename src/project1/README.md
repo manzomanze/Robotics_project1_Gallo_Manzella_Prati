@@ -89,3 +89,9 @@ To reset the pose to position x,y and orientation theta substitute relevant valu
 rosservice call resetpose x y theta 
 ```
 
+To run rviz and visualize the odometry
+```
+rviz
+```
+then click on add button in the lower left
+add odometry and set the topic to /odom after launching the launchfile
