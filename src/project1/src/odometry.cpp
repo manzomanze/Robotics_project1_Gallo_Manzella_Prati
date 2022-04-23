@@ -193,7 +193,7 @@ public:
       robot_x += vel_kx *samplingTime * cos(robot_theta) ;
 
       double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta));
-      robot_y += vel_ky*samplingTime;
+      robot_y += vel_ky*samplingTime * sin(robot_theta);
       
       robot_theta += angular_z * samplingTime;
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
