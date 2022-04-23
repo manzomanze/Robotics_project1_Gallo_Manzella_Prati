@@ -158,11 +158,12 @@ public:
     nav_msgs::Odometry odom_msg;
     
     
-    odom_msg.header.frame_id = "robot_frame";
+    odom_msg.header.frame_id = "odom";
     odom_msg.header.stamp = ros::Time::now();
     
     odom_msg.pose.pose.position.x = robot_x;
     odom_msg.pose.pose.position.y = robot_y;
+    odom_msg.pose.pose.position.z = 0.0;
     tf2::Quaternion quat_tf;
     geometry_msgs::Quaternion quat_msg;
     
@@ -171,6 +172,16 @@ public:
     tf2::convert(quat_tf,quat_msg);
     odom_msg.pose.pose.orientation = quat_msg;
     // print count to screen
+
+    odom_msg.child_frame_id = "base_link";
+    odom_msg.twist.twist.linear.x = robotLinearVelocityOnX;
+    odom_msg.twist.twist.linear.y = robotLinearVelocityOnY;
+    odom_msg.twist.twist.linear.z = 0.0;
+
+    odom_msg.twist.twist.angular.x = 0.0;
+    odom_msg.twist.twist.angular.y = 0.0;
+    odom_msg.twist.twist.angular.z = robotAngularVelocity;
+
     // publish messages
     odom_publisher.publish(odom_msg);
   }
