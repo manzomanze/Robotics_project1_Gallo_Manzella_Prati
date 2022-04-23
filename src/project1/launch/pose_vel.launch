@@ -15,4 +15,8 @@
     <node pkg="project1" type="odometry" name="speed_calculator" output="screen" />
     <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
 
+    <!-- Here the command to run rqt_plot -->
+    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="true_pose" args="/robot/pose/pose/position/x:y"/>
+    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="odometry" args="/odom/pose/pose/position/x:y" />
+
 </launch>
