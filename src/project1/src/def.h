@@ -6,9 +6,17 @@
 
 
 
-// //odometry
-// struct t_wheel_pos_vel;
-// struct t_msg;
+//odometry
+typedef struct t_wheel_pos_vel{
+  double vel[N_WHEELS];
+  double count_ticks[N_WHEELS];
+} t_wheel_pos_vel;
+
+typedef struct t_msg {
+  uint32_t seq;
+  double time;
+  t_wheel_pos_vel wheel_info;
+} t_msg;
 
 // class OdometryCalculator{
 //   public:
@@ -24,14 +32,22 @@
 // };
 
 
-// //gt_pose
-// struct position_t;
-// struct orientation_t;
-// struct pose_t;
+//gt_pose
+struct position_t;
+struct orientation_t;
+struct pose_t;
 
-// void printPosition(position_t position);
-// void printOrientation(orientation_t orient);
-// pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg);
+enum wheel_order {
+  FL,
+  FR,
+  RL,
+  RR
+};
+
+
+void printPosition(position_t position);
+void printOrientation(orientation_t orient);
+pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg);
 
 // class PoseClass { 
 //   void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg);
