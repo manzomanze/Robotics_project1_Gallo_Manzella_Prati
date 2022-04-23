@@ -84,3 +84,8 @@ rqt_plot /robot/pose/pose/position/x:y:z
 rqt_plot /odom/pose/pose/position/x:y:z
 ```
 
+To reset the pose to position x,y and orientation theta substitute relevant values to x y and theta
+```
+rosservice call resetpose x y theta 
+```
+
