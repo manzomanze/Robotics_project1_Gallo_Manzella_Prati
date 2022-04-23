@@ -1,5 +1,9 @@
 #include <ros/ros.h>
 #include "geometry_msgs/PoseStamped.h"
+#include "project1/parametersConfig.h"
+#include <dynamic_reconfigure/server.h>
+
+#define DEBUG 0
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
@@ -34,6 +38,7 @@ void printOrientation(orientation_t orient) {
     
 }
 
+//  Setter of the struct pose
 pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
     pose_t p;
     
@@ -54,8 +59,9 @@ pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
 }
 
 
-
-class PoseClass {
+// POSE CLASS:
+// This class manages the retrieval of pose info from the ground truth;
+class PoseClass { 
 
 /**
  * @brief This is the function we use to print out
@@ -67,18 +73,35 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
     pose_t actual_msg = createStruct(msg);
 
+    // enter this if at the first msg received, so that we set get the initial pose
+    if(isFirstMsg){
+        
+        // * Here we can set the initial_pose dynamically
+        ros::param::set("/ground_truth_listener/xPos", actual_msg.posit.x);
+        ros::param::set("/ground_truth_listener/yPos", actual_msg.posit.y);
+        ros::param::set("/ground_truth_listener/zPos", actual_msg.posit.z);
+        
+        ros::param::set("/ground_truth_listener/xOrient", actual_msg.orient.x);
+        ros::param::set("/ground_truth_listener/yOrient", actual_msg.orient.y);
+        ros::param::set("/ground_truth_listener/zOrient", actual_msg.orient.z);
+        ros::param::set("/ground_truth_listener/wOrient", actual_msg.orient.w);
 
-    ROS_INFO("Message number %d arrived", actual_msg.seq);
-    ROS_INFO("Time of the message: %f", actual_msg.time);
-    printPosition(actual_msg.posit);
-    printOrientation(actual_msg.orient);
-    std::cout << std::endl;
+        isFirstMsg = false;
+    }
+    if(DEBUG){
+        ROS_INFO("Message number %d arrived", actual_msg.seq);
+        ROS_INFO("Time of the message: %f", actual_msg.time);
+        printPosition(actual_msg.posit);
+        printOrientation(actual_msg.orient);
+        std::cout << std::endl;
+
+    }
 
 
 }
 
 public:
-
+    // The class subscribes to the ground truth  topic /robot/pose
     PoseClass() {
         subPose = nh.subscribe("robot/pose", 1000, &PoseClass::poseCallBack, this);
     }
@@ -87,17 +110,34 @@ public:
 
 private:
     ros::NodeHandle nh;
-    
     ros::Subscriber subPose;
+
+    bool isFirstMsg = true;
 
 };
 
+void param_callback(double* xPos, double* yPos, double* zPos,
+                    double* xOrient, double* yOrient, double* zOrient, double* wOrient,
+                    project1::parametersConfig &config, uint32_t level){
 
+    
+    ROS_INFO("Reconfigure request, new values are: %f",xPos);
+
+}
 
 int main(int argc, char * argv[])
 {
     ros::init(argc, argv, "ground_truth_listener");
+
+    pose_t initPose;
     
+    dynamic_reconfigure::Server<project1::parametersConfig> dynServ;
+    dynamic_reconfigure::Server<project1::parametersConfig>::CallbackType f;
+
+    f = boost::bind(&param_callback, &initPose.posit.x, &initPose.posit.y, &initPose.posit.z, 
+                                    &initPose.orient.x, &initPose.orient.y,&initPose.orient.z, &initPose.orient.w, _1, _2); 
+    dynServ.setCallback(f);
+
     PoseClass p;
 
     ros::spin();

@@ -1,0 +1,5 @@
+float64 linearx
+float64 lineary
+float64 angulartheta
+---
+int64 result
