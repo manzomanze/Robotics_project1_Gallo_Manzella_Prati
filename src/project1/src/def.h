@@ -1,4 +1,6 @@
-#define N_WHEELS 4
+#include "ros/ros.h"
+#include "param.h"
+
 
 //odometry
 enum wheel_order {
