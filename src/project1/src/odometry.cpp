@@ -4,6 +4,7 @@
 #include "nav_msgs/Odometry.h"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "project1/ResetPose.h"
 
 #define SEC_IN_MIN 60
 #define N_WHEELS 4
@@ -14,7 +15,7 @@
 #define Y_WHEEL_DISTANCE 0.169
 #define RADIUS_WHEEL 0.07
 #define EVERY_N_MSG_TO_DENOISE 3
-#define DEBUG 1
+#define DEBUG 0
 
 enum wheel_order {
   FL,
@@ -72,28 +73,7 @@ public:
       }
       
       
-      tf2Scalar x = -0.011577633209526539;
-      tf2Scalar y = -0.02075166068971157;
-      tf2Scalar z = -0.019595127552747726;
-      tf2Scalar w =  0.9995256066322327;
-
-      robot_x = 0.00815962441265583;
-      robot_y = 0.0030597213190048933;
       
-      // tf2::Quaternion quat_tf = tf2::Quaternion( &x, &y, &z, &w);
-      tf2::Quaternion quat_tf(x,y,z,w);
-      // quat_tf.setX(x);
-      // quat_tf.setY(y);
-      // quat_tf.setZ(z);
-      // quat_tf.setW(w);
-
-      tf2::Matrix3x3 mat(quat_tf);
-      tf2Scalar yaw, pitch, roll;
-      mat.getEulerYPR(yaw, pitch, roll);
-      if(DEBUG){
-        ROS_INFO("INITIAL ORIENTATION  yaw: %f; pitch: %f; roll: %f", yaw, pitch, roll);
-      }
-      robot_theta = yaw;
 
       // mat.getEulerYPR()       
 
@@ -250,14 +230,28 @@ public:
     }
   }
 
+
+  bool resetPose(project1::ResetPose::Request &req, project1::ResetPose::Response &res) {
+        robot_x = req.linearx;
+        robot_y = req.lineary;
+        robot_theta = req.angulartheta;
+        ROS_INFO("Set to:%f, %f, %f", robot_x, robot_y, robot_theta);
+
+        res.result = 200;
+        return true;
+    }
+
   // Constructor of the class OdometryCalculator
   OdometryCalculator(){ 
     robotLinearVelocityOnX = 0;
     robotLinearVelocityOnY = 0;
     robotAngularVelocity = 0;
+    float test = 0.0; 
     // robot_x = 0.0;
     // robot_y = 0.0;
-    // robot_theta = 0.0;
+    // robot_theta = 0.0;("resetToPose", &PubSub::resetToPose, this);
+    service =n.advertiseService("resetpose", &OdometryCalculator::resetPose, this);
+
     cmd_vel_publisher = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);    
     odom_publisher = n.advertise<nav_msgs::Odometry>("/odom", 1000); 
     sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
@@ -290,12 +284,13 @@ private:
   ros::Subscriber sub_encoder_wheel;
   ros::Publisher cmd_vel_publisher;
   ros::Publisher odom_publisher;
+  ros::ServiceServer service;
 };
 
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "speed_calculator");
-  //odom object of class OdometryCalcualtor
+  //odom object of class OdometryCalculator
   OdometryCalculator odom;
 
   ros::spin();

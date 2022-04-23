@@ -3,7 +3,7 @@
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
@@ -121,7 +121,7 @@ void param_callback(double* xPos, double* yPos, double* zPos,
                     project1::parametersConfig &config, uint32_t level){
 
     
-    ROS_INFO("Reconfigure request, new values are:");
+    ROS_INFO("Reconfigure request, new values are: %f",xPos);
 
 }
 
