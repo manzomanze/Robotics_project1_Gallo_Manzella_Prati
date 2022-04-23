@@ -16,12 +16,17 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Num.msg
- )
+)
+
+add_service_files(
+  FILES
+  ResetPose.srv
+)
 
 generate_messages(
-   DEPENDENCIES
-   std_msgs
- )
+  DEPENDENCIES
+  std_msgs
+)
 
 generate_dynamic_reconfigure_options(
   cfg/parameters.cfg

@@ -3,6 +3,8 @@
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
 
+#define DEBUG 0
+
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
 typedef struct {
@@ -36,6 +38,7 @@ void printOrientation(orientation_t orient) {
     
 }
 
+//  Setter of the struct pose
 pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
     pose_t p;
     
@@ -56,8 +59,9 @@ pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
 }
 
 
-
-class PoseClass {
+// POSE CLASS:
+// This class manages the retrieval of pose info from the ground truth;
+class PoseClass { 
 
 /**
  * @brief This is the function we use to print out
@@ -84,18 +88,20 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
         isFirstMsg = false;
     }
+    if(DEBUG){
+        ROS_INFO("Message number %d arrived", actual_msg.seq);
+        ROS_INFO("Time of the message: %f", actual_msg.time);
+        printPosition(actual_msg.posit);
+        printOrientation(actual_msg.orient);
+        std::cout << std::endl;
 
-    ROS_INFO("Message number %d arrived", actual_msg.seq);
-    ROS_INFO("Time of the message: %f", actual_msg.time);
-    printPosition(actual_msg.posit);
-    printOrientation(actual_msg.orient);
-    std::cout << std::endl;
+    }
 
 
 }
 
 public:
-
+    // The class subscribes to the ground truth  topic /robot/pose
     PoseClass() {
         subPose = nh.subscribe("robot/pose", 1000, &PoseClass::poseCallBack, this);
     }
@@ -115,7 +121,7 @@ void param_callback(double* xPos, double* yPos, double* zPos,
                     project1::parametersConfig &config, uint32_t level){
 
     
-    ROS_INFO("Reconfigure request, new values are:");
+    ROS_INFO("Reconfigure request, new values are: %f", *xPos);
 
 }
 
