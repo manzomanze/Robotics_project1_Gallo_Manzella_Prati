@@ -3,8 +3,6 @@
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
 
-#define DEBUG 0
-
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
 typedef struct {
