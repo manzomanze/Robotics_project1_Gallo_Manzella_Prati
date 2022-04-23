@@ -15,6 +15,7 @@
     <node pkg="project1" type="odometry" name="speed_calculator" output="screen" />
     <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
     <node pkg="project1" type="broadcaster_tf2" name="tf_broadcast" output="screen" />
+    <node pkg="project1" type="kinematics" name="kinematics" output="screen" />
     <node pkg="tf" type="static_transform_publisher" name="map" args="0.0 0.0 0.0 0.0 0.0 0.0 odom map 100"/>
     
 

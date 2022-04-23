@@ -51,3 +51,7 @@ target_link_libraries(gt_pose ${catkin_LIBRARIES})
 add_executable(broadcaster_tf2 src/broadcaster_tf2.cpp)
 add_dependencies(broadcaster_tf2 ${catkin_EXPORTED_TARGETS})
 target_link_libraries(broadcaster_tf2 ${catkin_LIBRARIES})
+
+add_executable(kinematics src/kinematics.cpp)
+add_dependencies(kinematics ${catkin_EXPORTED_TARGETS})
+target_link_libraries(kinematics ${catkin_LIBRARIES})

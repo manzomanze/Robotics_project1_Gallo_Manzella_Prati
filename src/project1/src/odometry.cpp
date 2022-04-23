@@ -13,7 +13,8 @@ class OdometryCalculator{
 public:
 
   void cmdVelCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
-    calculateRungeKuttaIntegration(msg->twist.linear.x,msg->twist.linear.y,msg->twist.angular.z);
+    ROS_INFO("%f %f %f",msg->twist.linear.x,msg->twist.linear.y,msg->twist.angular.z);
+    calculateRungeKuttaIntegration((double)msg->twist.linear.x,(double)msg->twist.linear.y,(double)msg->twist.angular.z,msg->header.stamp.toSec());
     publishMsg_odom(robot_x,robot_y,robot_theta);
   }
   
@@ -85,14 +86,14 @@ public:
 
 
   bool resetPose(project1::ResetPose::Request &req, project1::ResetPose::Response &res) {
-        robot_x = req.linearx;
-        robot_y = req.lineary;
-        robot_theta = req.angulartheta;
-        ROS_INFO("Set to:%f, %f, %f", robot_x, robot_y, robot_theta);
+    robot_x = req.linearx;
+    robot_y = req.lineary;
+    robot_theta = req.angulartheta;
+    ROS_INFO("Set to:%f, %f, %f", robot_x, robot_y, robot_theta);
 
-        res.result = 200;
-        return true;
-    }
+    res.result = 200;
+    return true;
+  }
 
   // Constructor of the class OdometryCalculator
   OdometryCalculator(){ 
@@ -100,14 +101,14 @@ public:
     float test = 0.0; 
 
     service = n.advertiseService("resetpose", &OdometryCalculator::resetPose, this);
-
+  
     cmd_vel_subscribe = n.subscribe("cmd_vel", 1000, &OdometryCalculator::cmdVelCallback,this);    
     odom_publisher = n.advertise<nav_msgs::Odometry>("/odom", 1000); 
-    sub_encoder_wheel = n.subscribe("wheel_states", 1000, &OdometryCalculator::encoderCallback,this);
   }
   
 private:
   
+
 
   // robot pose (Position and Orientation) in a fixed Frame of Reference
   double robot_x;
@@ -119,7 +120,6 @@ private:
   double robotAngularVelocity;
   
   ros::NodeHandle n;
-  ros::Subscriber sub_encoder_wheel;
   ros::Subscriber cmd_vel_subscribe;
   ros::Publisher odom_publisher;
   ros::ServiceServer service;

@@ -5,6 +5,8 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "project1/ResetPose.h"
+#include "param.h"
+#include "def.h"
 
 class Kinematics{
 public:
@@ -130,7 +132,7 @@ public:
     
     
     cmd_vel_msg.header.frame_id = "robot_frame";
-    cmd_vel_msg.header.stamp = ros::Time::now(); // ? non convien mettere il timestamp dell'ultimo messaggio ricevuto?
+    cmd_vel_msg.header.stamp = ros::Time(deltaTime); // ? non convien mettere il timestamp dell'ultimo messaggio ricevuto?
     
     cmd_vel_msg.twist.linear.x = linear_x;
     cmd_vel_msg.twist.linear.y = linear_y;
@@ -160,27 +162,27 @@ public:
   }
 
 private:
-    int isFirstMeasure = 1;
+  int isFirstMeasure = 1;
 
-    // here we use a variable to store the message only after 4 messages
-    // the idea is to limit the noise
+  // here we use a variable to store the message only after 4 messages
+  // the idea is to limit the noise
 
-    t_msg actual_msg, prevMsgEachNmsg;
+  t_msg actual_msg, prevMsgEachNmsg;
 
-    double deltaTime;
+  double deltaTime;
 
-    double robotLinearVelocityOnX;
-    double robotLinearVelocityOnY;
-    double robotAngularVelocity;
+  double robotLinearVelocityOnX;
+  double robotLinearVelocityOnY;
+  double robotAngularVelocity;
 
-    // here we declare the variables used for the computation of the velocity with less noise (hopefully)
-    int deltaMsgNumber = 0;
-    double deltaPosEachNmsg[N_WHEELS];
+  // here we declare the variables used for the computation of the velocity with less noise (hopefully)
+  int deltaMsgNumber = 0;
+  double deltaPosEachNmsg[N_WHEELS];
 
-    ros::NodeHandle n;
-    ros::Publisher cmd_vel_publisher;
-
-}
+  ros::NodeHandle n;
+  ros::Publisher cmd_vel_publisher;
+  ros::Subscriber sub_encoder_wheel;
+};
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "kinematics");
