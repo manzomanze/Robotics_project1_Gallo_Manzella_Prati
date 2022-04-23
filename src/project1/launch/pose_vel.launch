@@ -17,4 +17,9 @@
     <node pkg="project1" type="broadcaster_tf2" name="tf_broadcast" output="screen" />
     <node pkg="tf" type="static_transform_publisher" name="map" args="0.0 0.0 0.0 0.0 0.0 0.0 odom map 100"/>
     
+
+    <!-- Here the command to run rqt_plot -->
+    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="true_pose" args="/robot/pose/pose/position/x:y"/>
+    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="odometry" args="/odom/pose/pose/position/x:y" />
+
 </launch>

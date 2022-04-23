@@ -77,3 +77,10 @@ To run the reconfigure rqt interface:
 ```
 rosrun rqt_reconfigure rqt_reconfigure
 ```
+
+To run the plot:
+```
+rqt_plot /robot/pose/pose/position/x:y:z
+rqt_plot /odom/pose/pose/position/x:y:z
+```
+

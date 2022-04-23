@@ -121,7 +121,7 @@ void param_callback(double* xPos, double* yPos, double* zPos,
                     project1::parametersConfig &config, uint32_t level){
 
     
-    ROS_INFO("Reconfigure request, new values are: %f",xPos);
+    ROS_INFO("Reconfigure request, new values are: %f", *xPos);
 
 }
 
