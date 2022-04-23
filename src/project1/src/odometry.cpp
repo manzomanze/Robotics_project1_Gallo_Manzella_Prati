@@ -5,36 +5,8 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "project1/ResetPose.h"
-
-#define SEC_IN_MIN 60
-#define N_WHEELS 4
-#define N_WINDOWS 42
-#define RESOLUTION (2*3.14/(N_WINDOWS))
-#define GEAR_RATIO 5
-#define X_WHEEL_DISTANCE 0.200
-#define Y_WHEEL_DISTANCE 0.169
-#define RADIUS_WHEEL 0.07
-#define EVERY_N_MSG_TO_DENOISE 3
-#define DEBUG 0
-
-enum wheel_order {
-  FL,
-  FR,
-  RL,
-  RR
-};
-
-typedef struct {
-  double vel[N_WHEELS];
-  double count_ticks[N_WHEELS];
-} t_wheel_pos_vel;
-
-typedef struct {
-  uint32_t seq;
-  double time;
-
-  t_wheel_pos_vel wheel_info;
-} t_msg;
+#include "param.h"
+#include "def.h"
 
 
 class OdometryCalculator{
