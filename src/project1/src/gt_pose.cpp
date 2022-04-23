@@ -2,8 +2,7 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
-#include "param.h"
-
+#include "param.h
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
 typedef struct {
@@ -120,7 +119,7 @@ void param_callback(double* xPos, double* yPos, double* zPos,
                     project1::parametersConfig &config, uint32_t level){
 
     
-    ROS_INFO("Reconfigure request, new values are: %f",xPos);
+    ROS_INFO("Reconfigure request, new values are: %f", *xPos);
 
 }
 

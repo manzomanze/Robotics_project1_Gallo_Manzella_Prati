@@ -77,3 +77,21 @@ To run the reconfigure rqt interface:
 ```
 rosrun rqt_reconfigure rqt_reconfigure
 ```
+
+To run the plot:
+```
+rqt_plot /robot/pose/pose/position/x:y:z
+rqt_plot /odom/pose/pose/position/x:y:z
+```
+
+To reset the pose to position x,y and orientation theta substitute relevant values to x y and theta
+```
+rosservice call resetpose x y theta 
+```
+
+To run rviz and visualize the odometry
+```
+rviz
+```
+then click on add button in the lower left
+add odometry and set the topic to /odom after launching the launchfile
