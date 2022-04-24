@@ -69,10 +69,10 @@ public:
   // Calculates the odometry using Runge Kutta Integration Method
   void calculateRungeKuttaIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
     double rungeKuttaAdditionalRotation = angular_z*samplingTime/2;
-    double vel_kx = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta+rungeKuttaAdditionalRotation));
+    double vel_kx = (linear_x* cos(robot_theta+rungeKuttaAdditionalRotation)-linear_y * sin(robot_theta+rungeKuttaAdditionalRotation));
     robot_x += vel_kx *samplingTime * cos(robot_theta) ;
 
-    double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta+rungeKuttaAdditionalRotation));
+    double vel_ky = (linear_x* sin(robot_theta+rungeKuttaAdditionalRotation)+linear_y * cos(robot_theta+rungeKuttaAdditionalRotation));
     robot_y += vel_ky*samplingTime;
     
     robot_theta += angular_z * samplingTime;
