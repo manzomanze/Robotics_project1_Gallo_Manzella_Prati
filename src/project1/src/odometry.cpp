@@ -5,13 +5,10 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "project1/ResetPose.h"
-<<<<<<< HEAD
 // #include <dynamic_reconfigure/server.h>
 // #include "project1/integrationConfig.h" // include the dynamic reconfigure for the integration method
-=======
 #include "param.h"
 #include "def.h"
->>>>>>> origin/nicolas
 
 
 // enum wheel_order {
