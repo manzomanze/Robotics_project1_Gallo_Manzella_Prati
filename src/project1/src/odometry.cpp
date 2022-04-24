@@ -5,6 +5,8 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "project1/ResetPose.h"
+// #include <dynamic_reconfigure/server.h>
+// #include "project1/integrationConfig.h" // include the dynamic reconfigure for the integration method
 
 #define SEC_IN_MIN 60
 #define N_WHEELS 4
@@ -288,10 +290,24 @@ private:
   ros::ServiceServer service;
 };
 
+// void param_callback(int *integ_meth, project1::integrationConfig &config, uint32_t level){
+    
+//     ROS_INFO("Reconfigure request, new values are: %d", *integ_meth);
+
+// }
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "speed_calculator");
   //odom object of class OdometryCalculator
+
+  int integration_method; 
+  // dynamic_reconfigure::Server<project1::integrationConfig> dynServ;
+  // dynamic_reconfigure::Server<project1::integrationConfig>::CallbackType f;
+
+  // f = boost::bind(&param_callback, &integration_method, _1, _2); 
+  // dynServ.setCallback(f);
+
+
   OdometryCalculator odom;
 
   ros::spin();

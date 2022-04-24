@@ -30,6 +30,7 @@ generate_messages(
 
 generate_dynamic_reconfigure_options(
   cfg/parameters.cfg
+  cfg/integMethod.cfg
 ) 
 
 ## Declare a catkin package
