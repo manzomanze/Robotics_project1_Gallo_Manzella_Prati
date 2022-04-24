@@ -2,8 +2,7 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
-
-#define DEBUG 0
+#include "param.h"
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic
