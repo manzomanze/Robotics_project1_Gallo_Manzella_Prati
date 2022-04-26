@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Add custom message and its dependencies
 add_message_files(
   FILES
-  Num.msg
+  Wheels.msg
 )
 
 add_service_files(
@@ -55,3 +55,7 @@ target_link_libraries(broadcaster_tf2 ${catkin_LIBRARIES})
 add_executable(kinematics src/kinematics.cpp)
 add_dependencies(kinematics ${catkin_EXPORTED_TARGETS})
 target_link_libraries(kinematics ${catkin_LIBRARIES})
+
+add_executable(compute_control src/compute_control.cpp)
+add_dependencies(compute_control ${catkin_EXPORTED_TARGETS})
+target_link_libraries(compute_control ${catkin_LIBRARIES})

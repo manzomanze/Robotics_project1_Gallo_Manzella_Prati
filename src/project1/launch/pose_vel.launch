@@ -16,11 +16,16 @@
     <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
     <node pkg="project1" type="broadcaster_tf2" name="tf_broadcast" output="screen" />
     <node pkg="project1" type="kinematics" name="kinematics" output="screen" />
+    <node pkg="project1" type="compute_control" name="compute_control" output="screen" />
+
     <node pkg="tf" type="static_transform_publisher" name="map" args="0.0 0.0 0.0 0.0 0.0 0.0 odom map 100"/>
     
 
     <!-- Here the command to run rqt_plot -->
     <node pkg="rqt_plot" type="rqt_plot" output="screen" name="true_pose" args="/robot/pose/pose/position/x:y"/>
     <node pkg="rqt_plot" type="rqt_plot" output="screen" name="odometry" args="/odom/pose/pose/position/x:y" />
+
+    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="recomputed_rpm" args="/wheels_rpm/rpm_fl:rpm_rr:rpm_fr:rpm_rl"/>
+    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="original_rpm" args="/wheel_states/velocity[0]:velocity[1]:velocity[2]:velocity[3]" />
 
 </launch>
