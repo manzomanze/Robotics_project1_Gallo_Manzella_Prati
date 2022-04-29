@@ -5,10 +5,11 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "project1/ResetPose.h"
+// #include <dynamic_reconfigure/server.h>
+// #include "project1/integrationConfig.h" // include the dynamic reconfigure for the integration method
 #include "param.h"
 #include "def.h"
 #include "cmath"
-
 
 class OdometryCalculator{
 public:
@@ -55,11 +56,11 @@ public:
   }
   // Calculates the odometry using Euler Integration Method
   void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
-    double vel_kx = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta));
-    robot_x += vel_kx *samplingTime * cos(robot_theta) ;
+    double vel_kx = (linear_x* cos(robot_theta) - linear_y * sin(robot_theta));
+    robot_x += vel_kx *samplingTime;
 
-    double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta));
-    robot_y += vel_ky*samplingTime * sin(robot_theta + M_PI/2);
+    double vel_ky = (linear_x* sin(robot_theta) + linear_y * cos(robot_theta));
+    robot_y += vel_ky*samplingTime;
     
     robot_theta += angular_z * samplingTime;
   
@@ -75,6 +76,7 @@ public:
 
     double vel_ky = (linear_x* sin(robot_theta + rungeKuttaAdditionalRotation)+linear_y * cos(robot_theta + rungeKuttaAdditionalRotation));
     robot_y += vel_ky*samplingTime;
+
     ROS_INFO("velocities computed to reference axis %f %f",vel_kx,vel_ky);
     robot_theta += angular_z * samplingTime;
     if(1){
@@ -126,10 +128,24 @@ private:
   ros::ServiceServer service;
 };
 
+// void param_callback(int *integ_meth, project1::integrationConfig &config, uint32_t level){
+    
+//     ROS_INFO("Reconfigure request, new values are: %d", *integ_meth);
+
+// }
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "speed_calculator");
   //odom object of class OdometryCalculator
+
+  int integration_method; 
+  // dynamic_reconfigure::Server<project1::integrationConfig> dynServ;
+  // dynamic_reconfigure::Server<project1::integrationConfig>::CallbackType f;
+
+  // f = boost::bind(&param_callback, &integration_method, _1, _2); 
+  // dynServ.setCallback(f);
+
+
   OdometryCalculator odom;
 
   ros::spin();

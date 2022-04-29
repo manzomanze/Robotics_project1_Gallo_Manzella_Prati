@@ -4,7 +4,6 @@
 #include <dynamic_reconfigure/server.h>
 #include "nav_msgs/Odometry.h"
 #include "param.h"
-#include "def.h"
 
 // these structs are used to encapsule in a cleaner way the message
 // which will be listened on the topic

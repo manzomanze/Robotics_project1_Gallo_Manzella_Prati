@@ -10,7 +10,8 @@
 4. Use dynamic reconfigure to select between integration method
 
 ### Compute odometry
-Write down the formula to compute v and ⍵, adapt the forumla to use the ticks in the bag, which are less noisy. Compute a rough estimate of v and ⍵ and publish them on topic **cmd_vel** of type *geometry_msgs/TwistStamped*. <br>
+Write down the formula to compute v and ⍵, adapt the forumla to use the ticks in the bag, which are less noisy. <br>
+Compute a rough estimate of v and ⍵ and publish them on topic **cmd_vel** of type *geometry_msgs/TwistStamped*. <br>
 Now that we have the velocities, we need to compute the odometry. We use the Euler integration at first and then Runge-Kutta as well.
 
 We add ROS parameters for the initial pose (x, y, ϑ).
