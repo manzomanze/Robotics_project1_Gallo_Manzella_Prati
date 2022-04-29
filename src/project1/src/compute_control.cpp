@@ -9,6 +9,9 @@
 
 #include "project1/Wheels.h"
 
+/*
+** Class defining double info of the four wheels
+*/
 class Wheels{
   public: 
     double getWheel(wheel_order enumeration){
@@ -26,6 +29,15 @@ class Wheels{
 class ComputeControl{
 public:
 
+  /** 
+    ** calculateControl
+    Calculates the angular velocity of each wheel given velocity_linear_x, velocity_linear_y and velocity_angular_z
+    *! The wheel speeds the project requires to be published are in RPM as in Radians per Minute!!!
+
+    GEAR_RATIO and RADIUS_WHEEL are taken into account as wheel as the robot dimensions defined as
+    X_WHEEL_DISTANCE and Y_WHEEL_DISTANCE
+    
+  */
   Wheels calculateControl(){
 
     double rpm_fl;
@@ -47,6 +59,15 @@ public:
 
   }
 
+  /**
+    ** cmdVelCallbakc
+    Callback called each time a message on topic /cmd_vel is published by the kinematics node
+    It gathers the linear and angular velocities of the robot from the message and sets them to
+    ** velocity_linear_x, velocity_linear_y and velocity_angular_z private variables of the class
+    it does nothing on the first measure
+    ** it calls the function calculateControl
+    that computes the wheel angular velocities RPM and publishes them calling publishMsg_wheels function
+  */
   void cmdVelCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
     ROS_INFO("%f %f %f",msg->twist.linear.x,msg->twist.linear.y,msg->twist.angular.z);
     
@@ -59,7 +80,11 @@ public:
     publishMsg_wheels(wheel_velocities);
   }
   
-  // Publishes robot odometry on the topic odom
+  /** 
+  ** publishMsg_wheels
+  Publishes the wheel velocities that it gets from the @param wheel_vel_to_publish
+  setting the frame id to base_link
+  */
   void publishMsg_wheels(Wheels wheel_vel_to_publish){
     /* generate nav_msgs::Odometry msg containing the position 
     on x and  y and the angular position around the z axis */
@@ -78,7 +103,12 @@ public:
     control_publisher.publish(wheels_msg);
   }
 
-  // Constructor of the class ComputeControl
+  /** 
+  ** ComputeControl  
+    Constructor of the class ComputeControl
+    Initializes the publisher to topic wheels_rpm of wheel speeds computed back to recover the control input
+    Sets up the subscriber to the velocities computed and published by the Kinematics node on topic cmd_vel
+  */
   ComputeControl(){ 
     
     
@@ -104,7 +134,6 @@ private:
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "compute_control");
-  //odom object of class OdometryCalculator
   ComputeControl control;
 
   ros::spin();
