@@ -5,8 +5,8 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "project1/ResetPose.h"
-// #include <dynamic_reconfigure/server.h>
-// #include "project1/integrationConfig.h" // include the dynamic reconfigure for the integration method
+#include <dynamic_reconfigure/server.h>
+#include "project1/integMethodConfig.h" // include the dynamic reconfigure for the integration method
 #include "param.h"
 #include "def.h"
 #include "cmath"
@@ -128,22 +128,22 @@ private:
   ros::ServiceServer service;
 };
 
-// void param_callback(int *integ_meth, project1::integrationConfig &config, uint32_t level){
+void param_callback(int *integ_meth, project1::integMethodConfig &config, uint32_t level){
     
-//     ROS_INFO("Reconfigure request, new values are: %d", *integ_meth);
+    ROS_INFO("Reconfigure request, new values are: %d", config.integration_method);
 
-// }
+}
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "speed_calculator");
+  ros::init(argc, argv, "odometry");
   //odom object of class OdometryCalculator
 
   int integration_method; 
-  // dynamic_reconfigure::Server<project1::integrationConfig> dynServ;
-  // dynamic_reconfigure::Server<project1::integrationConfig>::CallbackType f;
+  dynamic_reconfigure::Server<project1::integMethodConfig> dynServ;
+  dynamic_reconfigure::Server<project1::integMethodConfig>::CallbackType f;
 
-  // f = boost::bind(&param_callback, &integration_method, _1, _2); 
-  // dynServ.setCallback(f);
+  f = boost::bind(&param_callback, &integration_method, _1, _2); 
+  dynServ.setCallback(f);
 
 
   OdometryCalculator odom;
