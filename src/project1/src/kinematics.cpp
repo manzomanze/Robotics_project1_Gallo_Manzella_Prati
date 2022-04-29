@@ -10,7 +10,15 @@
 
 class Kinematics{
 public:
-
+  /**
+    ** createStruct
+    sets up a struct of type
+    ** t_msg
+    from the information contained in the message of type JointState
+    typical of sensor messages
+    @param  msg of type sensor_msgs::JointState::ConstPtr&
+    **returns the struct as it was created of type t_msg
+  */
   t_msg createStruct(const sensor_msgs::JointState::ConstPtr& msg){
     t_msg actual_msg;
 
@@ -28,7 +36,21 @@ public:
     return actual_msg;
   }
 
-    //  Callback called each time a message on topic /wheel_states is published by the bag
+    /**
+      ** encoderCallback
+      Callback called each time a message on topic /wheel_states is published by the bag
+      It computes the angular velocity of each wheel from the ticks of the encoders
+      It tries to denoise the wheel tick info using an arbitrary number of consecutive
+      messages set with
+      ** EVERY_N_MSG_TO_DENOISE
+      after this amount of messages it calculates the number of ticks the wheel moved 
+      over the passed time and it multiplies by the RESOLUTION divided by the GEAR_RATIO
+      to get the angular velocity of the wheel and sets it to the array of doubles called
+      ** computedVelEachNmsg
+      it does nothing on the first measure
+      ** it calls the function calculatekinematics
+      that computes the rest of the kinematics
+    */
   void encoderCallback(const sensor_msgs::JointState::ConstPtr& msg) { 
     actual_msg = createStruct(msg);
     
@@ -96,10 +118,14 @@ public:
 
   }
 
-    /*
+    /** 
+    ** calculateKinematics
     Calculates the Direct Kinematics of the robot that is the
     speed of the robot (linear x and y and angular) 
     given the angular speed of each wheel
+
+    It needs to take into account the wheel radius set with RADIUS_WHEEL
+    and the movement of each wheel
 
     It calculates the movement adding up to EVERY_N_MSG_TO_DENOISE messages
   */
@@ -114,9 +140,9 @@ public:
     robotAngularVelocity = (RADIUS_WHEEL/4)/(X_WHEEL_DISTANCE+Y_WHEEL_DISTANCE)*
             (-computedVelEachNmsg[FL]+computedVelEachNmsg[FR]-computedVelEachNmsg[RL]+computedVelEachNmsg[RR]);
     if(DEBUG){
-    ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
-    ROS_INFO("ROBOT LINEAR VELOCITY ON Y %f",robotLinearVelocityOnY);
-    ROS_INFO("ROBOT ANGULAR VELOCITY %f",robotAngularVelocity);
+      ROS_INFO("ROBOT LINEAR VELOCITY ON X %f",robotLinearVelocityOnX);
+      ROS_INFO("ROBOT LINEAR VELOCITY ON Y %f",robotLinearVelocityOnY);
+      ROS_INFO("ROBOT ANGULAR VELOCITY %f",robotAngularVelocity);
     }
     publishMsg_cmd_vel(robotLinearVelocityOnX,robotLinearVelocityOnY,robotAngularVelocity);
     if(DEBUG){
@@ -124,7 +150,14 @@ public:
     }
   }
 
-    // Publishes robot velocities on the topic cmd_vel
+    /** 
+      ** publishMsg_cmd_vel
+      Publishes robot velocities on the topic cmd_vel with a message type
+      ** geometry_msgs::TwistStamped
+      *!  IMPORTANT the time of the message is actually the delta time to
+      *!  already have the delta time when we compute the odometry otherwise 
+      *! the time is not going to be consistent as the delta time would not be the same 
+    */
   void publishMsg_cmd_vel(double linear_x, double linear_y, double angular_z){
     /* generate geometry_msgs::TwistStamped msg containing the linear velocity 
     on x and  y and the angular velocity around the z axis */
@@ -149,11 +182,18 @@ public:
     
   }
 
+  /**
+  ** Kinematics
+  Constructor of the kinematics Class 
+  Sets up the robotLinearVelocityOn... X Y and robotAngularVelocity to zero
+  Initializes the publisher to topic cmd_vel of robot velocity info after kinematics
+  Sets up the subscriber to the ticks and RPM information provided by the bag
+
+  */
   Kinematics(){ 
     robotLinearVelocityOnX = 0;
     robotLinearVelocityOnY = 0;
     robotAngularVelocity = 0;
-    float test = 0.0; 
     
 
     cmd_vel_publisher = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1000);    
