@@ -56,11 +56,11 @@ public:
   }
   // Calculates the odometry using Euler Integration Method
   void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
-    double vel_kx = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta));
-    robot_x += vel_kx *samplingTime * cos(robot_theta) ;
+    double vel_kx = (linear_x* cos(robot_theta) - linear_y * sin(robot_theta));
+    robot_x += vel_kx *samplingTime;
 
-    double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta));
-    robot_y += vel_ky*samplingTime * sin(robot_theta + M_PI/2);
+    double vel_ky = (linear_x* sin(robot_theta) + linear_y * cos(robot_theta));
+    robot_y += vel_ky*samplingTime;
     
     robot_theta += angular_z * samplingTime;
   
@@ -76,6 +76,7 @@ public:
 
     double vel_ky = (linear_x* sin(robot_theta + rungeKuttaAdditionalRotation)+linear_y * cos(robot_theta + rungeKuttaAdditionalRotation));
     robot_y += vel_ky*samplingTime;
+
     ROS_INFO("velocities computed to reference axis %f %f",vel_kx,vel_ky);
     robot_theta += angular_z * samplingTime;
     if(1){
