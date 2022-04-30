@@ -2,6 +2,7 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "project1/parametersConfig.h"
 #include <dynamic_reconfigure/server.h>
+#include "nav_msgs/Odometry.h"
 #include "param.h"
 
 // these structs are used to encapsule in a cleaner way the message
@@ -62,6 +63,35 @@ pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
 // This class manages the retrieval of pose info from the ground truth;
 class PoseClass { 
 
+    void publishMsg_GroundTruth(pose_t msg){
+        nav_msgs::Odometry gt_pose_msg;
+
+        gt_pose_msg.header.frame_id = "odom";
+        gt_pose_msg.header.stamp = ros::Time::now();
+        gt_pose_msg.pose.pose.position.x = msg.posit.x;
+        gt_pose_msg.pose.pose.position.y = msg.posit.y;
+        gt_pose_msg.pose.pose.position.z = msg.posit.z;
+
+        gt_pose_msg.pose.pose.orientation.x = msg.orient.x;
+        gt_pose_msg.pose.pose.orientation.y = msg.orient.y;
+        gt_pose_msg.pose.pose.orientation.z = msg.orient.z;
+        gt_pose_msg.pose.pose.orientation.w = msg.orient.w;
+
+
+        gt_pose_msg.child_frame_id = "base_link";
+
+        gt_pose_msg.twist.twist.linear.x = 0.0;
+        gt_pose_msg.twist.twist.linear.y = 0.0;
+        gt_pose_msg.twist.twist.linear.z = 0.0;
+
+        gt_pose_msg.twist.twist.angular.x = 0.0;
+        gt_pose_msg.twist.twist.angular.y = 0.0;
+        gt_pose_msg.twist.twist.angular.z = 0.0;
+
+        gt_publisher.publish(gt_pose_msg);
+
+    }
+
 /**
  * @brief This is the function we use to print out
  * the pose retrieved by the topic /robot/pose
@@ -71,6 +101,8 @@ class PoseClass {
 void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
     pose_t actual_msg = createStruct(msg);
+
+    publishMsg_GroundTruth(actual_msg);
 
     // enter this if at the first msg received, so that we set get the initial pose
     if(isFirstMsg){
@@ -97,11 +129,13 @@ void poseCallBack(const geometry_msgs::PoseStamped::ConstPtr& msg) {
     }
 
 
+
 }
 
 public:
     // The class subscribes to the ground truth  topic /robot/pose
     PoseClass() {
+        gt_publisher = nh.advertise<nav_msgs::Odometry>("/gtpose", 1000);
         subPose = nh.subscribe("robot/pose", 1000, &PoseClass::poseCallBack, this);
     }
 
@@ -110,6 +144,7 @@ public:
 private:
     ros::NodeHandle nh;
     ros::Subscriber subPose;
+    ros::Publisher gt_publisher;
 
     bool isFirstMsg = true;
 

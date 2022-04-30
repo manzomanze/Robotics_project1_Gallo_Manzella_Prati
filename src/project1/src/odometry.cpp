@@ -9,31 +9,13 @@
 // #include "project1/integrationConfig.h" // include the dynamic reconfigure for the integration method
 #include "param.h"
 #include "def.h"
-
-
-// enum wheel_order {
-//   FL,
-//   FR,
-//   RL,
-//   RR
-// };
-
-// typedef struct t_wheel_pos_vel{
-//   double vel[N_WHEELS];
-//   double count_ticks[N_WHEELS];
-// } t_wheel_pos_vel;
-
-// typedef struct t_msg {
-//   uint32_t seq;
-//   double time;
-//   t_wheel_pos_vel wheel_info;
-// } t_msg;
+#include "cmath"
 
 class OdometryCalculator{
 public:
 
   void cmdVelCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
-    ROS_INFO("%f %f %f",msg->twist.linear.x,msg->twist.linear.y,msg->twist.angular.z);
+    ROS_INFO("Received cmdVel %f %f %f",msg->twist.linear.x,msg->twist.linear.y,msg->twist.angular.z);
     calculateRungeKuttaIntegration((double)msg->twist.linear.x,(double)msg->twist.linear.y,(double)msg->twist.angular.z,msg->header.stamp.toSec());
     publishMsg_odom(robot_x,robot_y,robot_theta);
   }
@@ -68,7 +50,7 @@ public:
     odom_msg.twist.twist.angular.x = 0.0;
     odom_msg.twist.twist.angular.y = 0.0;
     odom_msg.twist.twist.angular.z = robotAngularVelocity;
-
+    ROS_INFO("sent to odom %f %f",odom_msg.pose.pose.position.x,odom_msg.pose.pose.position.y);
     // publish messages
     odom_publisher.publish(odom_msg);
   }
@@ -78,7 +60,7 @@ public:
     robot_x += vel_kx *samplingTime * cos(robot_theta) ;
 
     double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta));
-    robot_y += vel_ky*samplingTime * sin(robot_theta);
+    robot_y += vel_ky*samplingTime * sin(robot_theta + M_PI/2);
     
     robot_theta += angular_z * samplingTime;
   
@@ -89,14 +71,14 @@ public:
   // Calculates the odometry using Runge Kutta Integration Method
   void calculateRungeKuttaIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
     double rungeKuttaAdditionalRotation = angular_z*samplingTime/2;
-    double vel_kx = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta+rungeKuttaAdditionalRotation));
-    robot_x += vel_kx *samplingTime * cos(robot_theta) ;
+    double vel_kx = (linear_x* cos(robot_theta + rungeKuttaAdditionalRotation)-linear_y * sin(robot_theta + rungeKuttaAdditionalRotation));
+    robot_x += vel_kx *samplingTime ;
 
-    double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta+rungeKuttaAdditionalRotation));
+    double vel_ky = (linear_x* sin(robot_theta + rungeKuttaAdditionalRotation)+linear_y * cos(robot_theta + rungeKuttaAdditionalRotation));
     robot_y += vel_ky*samplingTime;
-    
+    ROS_INFO("velocities computed to reference axis %f %f",vel_kx,vel_ky);
     robot_theta += angular_z * samplingTime;
-    if(DEBUG){
+    if(1){
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
     }
   }
