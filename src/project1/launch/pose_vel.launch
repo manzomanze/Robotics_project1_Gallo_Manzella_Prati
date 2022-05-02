@@ -25,7 +25,7 @@
     <node pkg="rqt_plot" type="rqt_plot" output="screen" name="true_pose" args="/robot/pose/pose/position/x:y"/>
     <node pkg="rqt_plot" type="rqt_plot" output="screen" name="odometry" args="/odom/pose/pose/position/x:y" />
 
-    <node pkg="rqt_plot" type="rqt_plot" output="screen" name="recomputed_rpm" args="/wheels_rpm/rpm_fl:rpm_rr:rpm_fr:rpm_rl"/>
+   <!-- <node pkg="rqt_plot" type="rqt_plot" output="screen" name="recomputed_rpm" args="/wheels_rpm/rpm_fl:rpm_rr:rpm_fr:rpm_rl"/>
     <node pkg="rqt_plot" type="rqt_plot" output="screen" name="original_rpm" args="/wheel_states/velocity[0]:velocity[1]:velocity[2]:velocity[3]" />
 
-</launch>
+--></launch>

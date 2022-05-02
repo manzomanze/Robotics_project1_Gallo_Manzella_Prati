@@ -55,10 +55,10 @@ public:
   // Calculates the odometry using Euler Integration Method
   void calculateEulerIntegration(double linear_x, double linear_y, double angular_z, double samplingTime){
     double vel_kx = (linear_x* cos(robot_theta)-linear_y * sin(robot_theta));
-    robot_x += vel_kx *samplingTime * cos(robot_theta) ;
+    robot_x += vel_kx *samplingTime;
 
     double vel_ky = (linear_x* sin(robot_theta)+linear_y * cos(robot_theta));
-    robot_y += vel_ky*samplingTime * sin(robot_theta + M_PI/2);
+    robot_y += vel_ky*samplingTime;
     
     robot_theta += angular_z * samplingTime;
   
