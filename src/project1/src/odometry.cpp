@@ -16,9 +16,24 @@ public:
 
   void cmdVelCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
     ROS_INFO("Received cmdVel %f %f %f",msg->twist.linear.x,msg->twist.linear.y,msg->twist.angular.z);
-    calculateRungeKuttaIntegration((double)msg->twist.linear.x,(double)msg->twist.linear.y,(double)msg->twist.angular.z,msg->header.stamp.toSec());
+    if(currentIntegration == 0){
+      calculateEulerIntegration((double)msg->twist.linear.x,(double)msg->twist.linear.y,(double)msg->twist.angular.z,msg->header.stamp.toSec());
+
+    }
+    else{
+      calculateRungeKuttaIntegration((double)msg->twist.linear.x,(double)msg->twist.linear.y,(double)msg->twist.angular.z,msg->header.stamp.toSec());
+    }
+      
     publishMsg_odom(robot_x,robot_y,robot_theta);
   }
+
+  void param_callback( project1::integMethodConfig &config, uint32_t level){
+    
+    ROS_INFO("Reconfigure request, new values are: %d", config.integration_method);
+    //currentIntegration = config.integration_method;
+    ROS_INFO("CURRENT INTEGRATION %d",currentIntegration);
+
+}
   
   // Publishes robot odometry on the topic odom
   void publishMsg_odom(double robot_x, double robot_y, double robot_theta){
@@ -64,7 +79,8 @@ public:
     
     robot_theta += angular_z * samplingTime;
   
-    if(DEBUG){
+    if(1){
+      ROS_INFO("EULER");
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
     }
   }
@@ -80,6 +96,7 @@ public:
     ROS_INFO("velocities computed to reference axis %f %f",vel_kx,vel_ky);
     robot_theta += angular_z * samplingTime;
     if(1){
+      ROS_INFO("RKKKKK");
       ROS_INFO("Robot X [%f] Robot Y [%f] Robot Theta [%f]",robot_x,robot_y,robot_theta);
     }
   }
@@ -100,8 +117,10 @@ public:
 
   // Constructor of the class OdometryCalculator
   OdometryCalculator(){ 
-    
-    float test = 0.0; 
+
+    currentIntegration = 1;
+    //f = boost::bind(&OdometryCalculator::param_callback,this, _1, _2); 
+    //dynServ.setCallback(f);
 
     service = n.advertiseService("resetpose", &OdometryCalculator::resetPose, this);
   
@@ -111,7 +130,7 @@ public:
   
 private:
   
-
+  int currentIntegration;
 
   // robot pose (Position and Orientation) in a fixed Frame of Reference
   double robot_x;
@@ -121,29 +140,27 @@ private:
   double robotLinearVelocityOnX;
   double robotLinearVelocityOnY;
   double robotAngularVelocity;
+
+  
   
   ros::NodeHandle n;
   ros::Subscriber cmd_vel_subscribe;
   ros::Publisher odom_publisher;
   ros::ServiceServer service;
+
+  dynamic_reconfigure::Server<project1::integMethodConfig> dynServ;
+  dynamic_reconfigure::Server<project1::integMethodConfig>::CallbackType f;
+
+  
 };
 
-void param_callback(int *integ_meth, project1::integMethodConfig &config, uint32_t level){
-    
-    ROS_INFO("Reconfigure request, new values are: %d", config.integration_method);
 
-}
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "odometry");
   //odom object of class OdometryCalculator
 
-  int integration_method; 
-  dynamic_reconfigure::Server<project1::integMethodConfig> dynServ;
-  dynamic_reconfigure::Server<project1::integMethodConfig>::CallbackType f;
-
-  f = boost::bind(&param_callback, &integration_method, _1, _2); 
-  dynServ.setCallback(f);
+ 
 
 
   OdometryCalculator odom;

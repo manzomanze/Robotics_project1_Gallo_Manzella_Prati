@@ -44,6 +44,10 @@ enum wheel_order {
   RR
 };
 
+enum integration_method_enum {
+  EULER,
+  RK
+};
 
 void printPosition(position_t position);
 void printOrientation(orientation_t orient);
