@@ -30,7 +30,7 @@ public:
   void param_callback( project1::integMethodConfig &config, uint32_t level){
     
     ROS_INFO("Reconfigure request, new values are: %d", config.integration_method);
-    //currentIntegration = config.integration_method;
+    currentIntegration = config.integration_method;
     ROS_INFO("CURRENT INTEGRATION %d",currentIntegration);
 
 }
@@ -117,10 +117,12 @@ public:
 
   // Constructor of the class OdometryCalculator
   OdometryCalculator(){ 
-
-    currentIntegration = 1;
-    //f = boost::bind(&OdometryCalculator::param_callback,this, _1, _2); 
-    //dynServ.setCallback(f);
+    robot_x = 0.0;
+    robot_y = 0.0;
+    robot_theta = 0.0;
+    currentIntegration = 0;
+    f = boost::bind(&OdometryCalculator::param_callback,this, _1, _2); 
+    dynServ.setCallback(f);
 
     service = n.advertiseService("resetpose", &OdometryCalculator::resetPose, this);
   
