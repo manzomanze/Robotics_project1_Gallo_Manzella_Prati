@@ -10,7 +10,8 @@
 4. Use dynamic reconfigure to select between integration method
 
 ### Compute odometry
-Write down the formula to compute v and ⍵, adapt the forumla to use the ticks in the bag, which are less noisy. Compute a rough estimate of v and ⍵ and publish them on topic **cmd_vel** of type *geometry_msgs/TwistStamped*. <br>
+Write down the formula to compute v and ⍵, adapt the forumla to use the ticks in the bag, which are less noisy. <br>
+Compute a rough estimate of v and ⍵ and publish them on topic **cmd_vel** of type *geometry_msgs/TwistStamped*. <br>
 Now that we have the velocities, we need to compute the odometry. We use the Euler integration at first and then Runge-Kutta as well.
 
 We add ROS parameters for the initial pose (x, y, ϑ).
@@ -77,3 +78,21 @@ To run the reconfigure rqt interface:
 ```
 rosrun rqt_reconfigure rqt_reconfigure
 ```
+
+To run the plot:
+```
+rqt_plot /robot/pose/pose/position/x:y:z
+rqt_plot /odom/pose/pose/position/x:y:z
+```
+
+To reset the pose to position x,y and orientation theta substitute relevant values to x y and theta
+```
+rosservice call resetpose x y theta 
+```
+
+To run rviz and visualize the odometry
+```
+rviz
+```
+then click on add button in the lower left
+add odometry and set the topic to /odom after launching the launchfile
