@@ -60,13 +60,19 @@ public:
 
 }
   
+  /** 
    /** 
-   **publishMsg_odom
+  /** 
+  **publishMsg_odom
+  Publishes robot odometry on the topic /odom 
    Publishes robot odometry on the topic /odom 
-   @param publish_odom_x x position in meters of the robot with respect to the odom tf  
+  Publishes robot odometry on the topic /odom 
+  @param publish_odom_x xg position in meters of the robot with respect to the odom tf  
+  @param publish_odom_y y position in meters of the robot with respect to the odom tf 
    @param publish_odom_y y position in meters of the robot with respect to the odom tf 
-   @param publish_odom_theta theta orientation in radians of the robot with resepect to the odom tf
-   */
+  @param publish_odom_y y position in meters of the robot with respect to the odom tf 
+  @param publish_odom_theta theta orientation in radians of the robot with resepect to the odom tf
+  */
   void publishMsg_odom(double publish_odom_x, double publish_odom_y, double publish_odom_theta){
     /* generate nav_msgs::Odometry msg containing the position 
     on x and  y and the angular position around the z axis */
@@ -179,9 +185,27 @@ public:
 
   // Constructor of the class OdometryCalculator
   OdometryCalculator(){ 
-    robot_tf_odom_x = 0.0;
-    robot_tf_odom_y = 0.0;
-    robot_tf_odom_theta = 0.0;
+    ros::param::get("initial_pose/position/xPos",  robot_tf_odom_x);
+    ros::param::get("initial_pose/position/yPos", robot_tf_odom_y);
+
+    double quat_x,quat_y,quat_z,quat_w;
+    ros::param::get("initial_pose/orientation/x", quat_x);
+    ros::param::get("initial_pose/orientation/y", quat_y);
+    ros::param::get("initial_pose/orientation/z", quat_z);
+    ros::param::get("initial_pose/orientation/w", quat_w);
+    tf2::Quaternion q(
+      quat_x,
+      quat_y,
+      quat_z,
+      quat_w);
+    tf2::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+    ROS_INFO("INITIAL QUATERNION %f %f %f %f",quat_x,quat_y,quat_z,quat_w);
+    //robot_tf_odom_theta = yaw;
+    ros::param::get("initial_pose/orientation/theta",robot_tf_odom_theta);
+    ROS_INFO("INITIAL POSITION AND ORIENTATION %f %f %f",robot_tf_odom_x,robot_tf_odom_y,robot_tf_odom_theta);
+
     currentIntegration = 0;
     f = boost::bind(&OdometryCalculator::param_callback,this, _1, _2); 
     dynServ.setCallback(f);

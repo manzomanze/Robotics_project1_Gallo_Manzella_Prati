@@ -3,14 +3,17 @@
     <!-- The parameter server ues the name convention of ros, so, by defining so the name of the parameters -->
     <!-- we are able to retrieve the position and orientation just by execute the rosparam /initial_pose commands -->
     
-    <!-- <param name="initial_pose/position/xPos" value = "0" />
-    <param name="initial_pose/position/yPos" value = "0" />
-    <param name="initial_pose/position/zPos" value = "0" />
+    <param name="initial_pose/position/xPos" type="double" value = "0.008160" />
+    <param name="initial_pose/position/yPos" type="double" value = "0.003060" />
+    <param name="initial_pose/position/zPos" type="double" value = "0.0" />
 
-    <param name="initial_pose/orientation/x" value = "0" />
-    <param name="initial_pose/orientation/y" value = "0"/>
-    <param name="initial_pose/orientation/z" value = "0"/>
-    <param name="initial_pose/orientation/w" value = "0"/> -->
+    <param name="initial_pose/orientation/x" type="double" value = "-0.011578" />
+    <param name="initial_pose/orientation/y" type="double" value = "-0.011578"/>
+    <param name="initial_pose/orientation/z" type="double" value = "-0.019595"/>
+    <param name="initial_pose/orientation/w" type="double" value = "0.999526"/>
+    <param name="initial_pose/orientation/theta" type="double" value = "0.0"/>
+
+    <param name="n_windows" type="int" value = "44" />
 
     <node pkg="project1" type="odometry" name="speed_calculator" output="screen" />
     <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
