@@ -131,3 +131,16 @@ The provided config (either config.rviz or topdown.rviz) can be used to avoid th
 Manually click on **add** button in the lower left choose **odometry** from the list and set the **topic** to **/odom** after the nodes and roscore have been launched with the launchfile
 The ground truth extracted from the bag messages can be used adding another odometry coming from **/gtpose** topic
 
+To plot with plotjuggler first install
+```
+sudo apt install ros-melodic-plotjuggler-ros
+```
+then
+```
+rosrun plotjuggler plotjuggler
+```
+click on streaming section selelct the dropdown menu choose "ROS Topic Subscriber" 
+select any interesting topic for example the computed odometry
+
+run the bag a little to let it discover the values
+then select and drag in the graph each value separately to plot x and y separately otherwise select multiple values and drag using the ***RIGHT BUTTON OF THE MOUSE*** on a graph to plot an xy plot
