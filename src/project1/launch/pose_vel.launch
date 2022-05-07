@@ -2,18 +2,42 @@
 
     <!-- The parameter server ues the name convention of ros, so, by defining so the name of the parameters -->
     <!-- we are able to retrieve the position and orientation just by execute the rosparam /initial_pose commands -->
-    
-    <param name="initial_pose/position/xPos" type="double" value = "0.008160" />
+
+    <!-- INITIAL POSE FOR BAG 1 -->
+
+    <!-- <param name="initial_pose/position/xPos" type="double" value = "0.008160" />
     <param name="initial_pose/position/yPos" type="double" value = "0.003060" />
     <param name="initial_pose/position/zPos" type="double" value = "0.0" />
 
     <param name="initial_pose/orientation/x" type="double" value = "-0.011578" />
     <param name="initial_pose/orientation/y" type="double" value = "-0.011578"/>
     <param name="initial_pose/orientation/z" type="double" value = "-0.019595"/>
-    <param name="initial_pose/orientation/w" type="double" value = "0.999526"/>
-    <param name="initial_pose/orientation/theta" type="double" value = "0.0"/>
+    <param name="initial_pose/orientation/w" type="double" value = "0.999526"/> -->
 
-    <param name="n_windows" type="int" value = "44" />
+    <!-- INITAL POSE FOR BAG 2 -->
+    
+    <!-- <param name="initial_pose/position/xPos" type="double" value = "0.024221817031502724" />
+    <param name="initial_pose/position/yPos" type="double" value = "0.003742524655535817" />
+    <param name="initial_pose/position/zPos" type="double" value = "0.0" />
+
+    <param name="initial_pose/orientation/x" type="double" value = "0.0338488332927227" />
+    <param name="initial_pose/orientation/y" type="double" value = "-0.05557403340935707"/>
+    <param name="initial_pose/orientation/z" type="double" value = "-0.0028051661793142557"/>
+    <param name="initial_pose/orientation/w" type="double" value = " 0.997876763343811"/> -->
+    
+    <!-- INITIAL POSE FOR BAG 3 -->
+
+    <param name="initial_pose/position/xPos" type="double" value = "0.005460123997181654" />
+    <param name="initial_pose/position/yPos" type="double" value = "0.03997037187218666" />
+    <param name="initial_pose/position/zPos" type="double" value = "0.0" />
+
+    <param name="initial_pose/orientation/x" type="double" value = "-0.010593205690383911" />
+    <param name="initial_pose/orientation/y" type="double" value = "-0.024768192321062088"/>
+    <param name="initial_pose/orientation/z" type="double" value = "-0.006751589477062225"/>
+    <param name="initial_pose/orientation/w" type="double" value = "0.9996143579483032"/>
+    <!-- NOT USED -->
+    <!-- <param name="initial_pose/orientation/theta" type="double" value = "0.0"/> -->
+
 
     <node pkg="project1" type="odometry" name="speed_calculator" output="screen" />
     <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
