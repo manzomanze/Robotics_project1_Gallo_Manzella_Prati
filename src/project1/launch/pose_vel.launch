@@ -39,7 +39,7 @@
     <!-- <param name="initial_pose/orientation/theta" type="double" value = "0.0"/> -->
 
 
-    <node pkg="project1" type="odometry" name="speed_calculator" output="screen" />
+    <node pkg="project1" type="odometry" name="odometry" output="screen" />
     <node pkg="project1" type="gt_pose" name="ground_truth_listener" output="screen" />
     <node pkg="project1" type="broadcaster_tf2" name="tf_broadcast" output="screen" />
     <node pkg="project1" type="kinematics" name="kinematics" output="screen" />

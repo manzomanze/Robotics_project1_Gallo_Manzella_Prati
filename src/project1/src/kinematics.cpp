@@ -73,9 +73,10 @@ public:
     }
 
     // here I need to check that the four message are passed
-    deltaMsgNumber = actual_msg.seq - prevMsgEachNmsg.seq;
+    deltaMsgNumber ++;
     // we enter this if each N messages
     if(deltaMsgNumber == EVERY_N_MSG_TO_DENOISE){
+      deltaMsgNumber = 0;
       
       // now the delta time is performed between msgs that are distant 4 msgs
       deltaTime = actual_msg.time - prevMsgEachNmsg.time;
@@ -156,7 +157,7 @@ public:
       ** geometry_msgs::TwistStamped
       *!  IMPORTANT the time of the message is actually the delta time to
       *!  already have the delta time when we compute the odometry otherwise 
-      *! the time is not going to be consistent as the delta time would not be the same 
+      *!  the time is not going to be consistent as the delta time would not be the same 
     */
   void publishMsg_cmd_vel(double linear_x, double linear_y, double angular_z){
     /* generate geometry_msgs::TwistStamped msg containing the linear velocity 

@@ -65,7 +65,7 @@ rosservice call resetpose x y theta
 Dynamic Reconfigure can be used to set the Integration method at runtime
 Using a cli command 0 stands for EULER and 1 for RUNGE-KUTTA
 ```
-rosrun dynamic_reconfigure dynparam set /speed_calculator integration_method 0
+rosrun dynamic_reconfigure dynparam set /odometry integration_method 0
 ```
 Using the gui utility 
 ```
