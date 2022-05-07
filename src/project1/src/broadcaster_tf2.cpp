@@ -9,7 +9,15 @@ class TfBroad {
 public:
     
 
-
+    /**
+    ** base_link_callback
+    * Called each time a message is published on the topic odom
+    * It sets a message of type geometry_msgs::TransformStamped
+    * used to publish on the transformation tree
+    * in particular it is describing the transformation of the tf node
+    **base_link
+    * @param msg of type nav_msgs::Odometry::ConstPtr&
+    */
     void base_link_callback(const nav_msgs::Odometry::ConstPtr& msg){
         odom_base_link.header.stamp = ros::Time::now();
         odom_base_link.header.frame_id = "odom";

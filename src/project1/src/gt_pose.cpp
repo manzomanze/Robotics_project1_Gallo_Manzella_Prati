@@ -28,17 +28,30 @@ typedef struct {
     orientation_t orient;  
 } pose_t;
 
+/** 
+** printPosition
+* Prints a position in x,y and z
+* @param position of struct type position_t
+*/
 void printPosition(position_t position) {
     ROS_INFO("POSITION  x: %f, y: %f, z: %f", position.x, position.y, position.z);
     
 }
-
+/** 
+** printPosition
+* Prints a position in x,y and z
+* @param position of struct type position_t
+*/
 void printOrientation(orientation_t orient) {
     ROS_INFO("ORIENTATION  x: %f, y: %f, z: %f, w: %f", orient.x, orient.y, orient.z, orient.w);
     
 }
 
-//  Setter of the struct pose
+/** 
+** createStruct
+* Sets the struct of type pose_t and returns it.
+* @param msg of type geometry_msgs::PoseStamped::ConstPtr&
+*/
 pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
     pose_t p;
     
@@ -62,7 +75,11 @@ pose_t createStruct(const geometry_msgs::PoseStamped::ConstPtr& msg){
 // POSE CLASS:
 // This class manages the retrieval of pose info from the ground truth;
 class PoseClass { 
-
+    /** 
+    ** publishMsg_GroundTruth
+    * Creates a message of type nav_msgs::Odometry.
+    * @param msg of type geometry_msgs::PoseStamped::ConstPtr&
+    */
     void publishMsg_GroundTruth(pose_t msg){
         nav_msgs::Odometry gt_pose_msg;
 
@@ -93,6 +110,7 @@ class PoseClass {
     }
 
 /**
+** poseCallBack
  * @brief This is the function we use to print out
  * the pose retrieved by the topic /robot/pose
  * 
