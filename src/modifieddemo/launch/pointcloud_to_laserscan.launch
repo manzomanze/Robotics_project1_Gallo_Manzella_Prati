@@ -1,0 +1,35 @@
+<launch>
+	
+	<node pkg="pointcloud_to_laserscan" name="pointcloud_to_laserscan_node" type="pointcloud_to_laserscan_node" output="screen">
+	<remap from="/cloud_in" to="/sick_long_range_front/cloud"/>
+	<remap from="/scan" to="/scan_multi"/>
+		<param name="angle_increment" value="0.005"/>
+		<param name="angle_min" value="-1.4"/>
+		<param name="angle_max" value="+1.4"/>
+		<param name="range_max" value="50.0"/>
+	
+
+	</node>
+	
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_velodyne_rear" args="-1.925 0.0 0.55 3.14 0.139 0.0 base_link velodyne_rear 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_velodyne_front" args="1.925 0.0 0.55 0.0 0.139 0.0 base_link velodyne_front 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_sick_front_left" args="1.85 0.93 0.0 0.81 0.0 3.14 base_link sick_front_left 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_sick_front_right" args="1.85  -0.93 0.0 -0.76 0.0 3.14 base_link sick_front_right 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_sick_rear_left" args="-1.85 0.93 0.0 2.38 0.0 3.14 base_link sick_rear_left 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_sick_rear_right" args="-1.75 -0.8 0.0 -2.30 0.0 3.14 base_link sick_rear_right 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_sick_long_front" args="0.15 0.0 2.8 0.0 0.0 0.0 base_link sick_long_front 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_sick_long_rear" args="-0.15 0.0 2.8 3.14 0.0 0.0 base_link sick_long_rear 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="base_link_to_scan" args="0.0 0.0 0.0 0.0 0.0 0.0 base_link scan 100" />
+	
+
+
+
+</launch>

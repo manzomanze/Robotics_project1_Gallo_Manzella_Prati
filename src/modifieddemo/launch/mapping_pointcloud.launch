@@ -1,0 +1,24 @@
+<launch>
+
+ <param name="/use_sim_time" value="true"/>
+
+  <!--  ************** add odom tf  ***************  -->
+   <node pkg="modifieddemo" type="odom_tf" respawn="false" name="odom_tf" output="screen"/>
+   
+
+
+
+ <!-- **************  Robot loc **************  -->
+  <include file="$(find modifieddemo)/launch/localization.launch"/>
+
+<!-- **************  scan_merger **************  -->
+  <include file="$(find modifieddemo)/launch/pointcloud_to_laserscan.launch"/>
+  
+<!-- **************  gmapping config **************  -->  
+  <include file="$(find modifieddemo)/config/gmapping.launch.xml"/>
+
+
+
+
+</launch>
+
