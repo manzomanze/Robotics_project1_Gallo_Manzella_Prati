@@ -4,7 +4,7 @@
 
 
   <!--  ************** add odom tf  ***************  -->
-   <node pkg="modifieddemo" type="odom_tf" respawn="false" name="odom_tf" output="screen"/>
+   <node pkg="modifieddemo" type="odom_tf_modified" respawn="false" name="odom_tf_modified" output="screen"/>
    
 
 
@@ -20,6 +20,10 @@
 
 
 
+	<!-- Launches rviz with a config that shows merged lasers, odometry and map as created by gmapping -->
+	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find project2)/laser_map_odometry.rviz" >
+	<param name="/use_sim_time" value="true"/>
+	</node>
 
 </launch>
 

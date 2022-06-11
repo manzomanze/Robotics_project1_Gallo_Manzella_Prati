@@ -20,7 +20,7 @@ ros::Timer timer1;
 	
 public:
   	pub_sub(){
-  	sub = n.subscribe("/odometry/local", 1, &pub_sub::callback, this);
+  	sub = n.subscribe("/odom", 1, &pub_sub::callback, this);
 	  
 
 }
