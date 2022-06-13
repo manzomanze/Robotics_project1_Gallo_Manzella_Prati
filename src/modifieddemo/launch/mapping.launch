@@ -7,11 +7,12 @@
    <node pkg="modifieddemo" type="odom_tf_modified" respawn="false" name="odom_tf_modified" output="screen"/>
    
 
-
+<!--  *****************  AMCL  ***************  -->
+<!-- <include file="$(find modifieddemo)/launch/amcl.launch"/> -->
 
  <!-- **************  Robot loc **************  -->
-<include file="$(find modifieddemo)/launch/localization.launch"/>
-
+<!-- <include file="$(find modifieddemo)/launch/localization.launch"/>
+ -->
 <!-- **************  scan_merger **************  -->
   <include file="$(find modifieddemo)/launch/scan_merger.launch"/>
   
