@@ -10,6 +10,9 @@
    <!-- **************  scan_merger **************  -->
   <include file="$(find modifieddemo)/launch/scan_merger.launch"/>
 
+  <!-- ***************  Trajectory *************** -->
+  <include file="$(find modifieddemo)/launch/trajectory.launch"/>
+
   <!--  *****************  AMCL  ***************  -->
   <include file="$(find modifieddemo)/config/amcl.launch"/>
 
