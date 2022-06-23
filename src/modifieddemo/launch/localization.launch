@@ -19,7 +19,7 @@
   <!--  *****************  AMCL  ***************  -->
   <include file="$(find modifieddemo)/config/amcl.launch"/>
 
-  <node pkg="modifieddemo" type="smoothing_map.py" name="depth_saver"/>
+  <node pkg="modifieddemo" type="smoothing_map.py" name="depth_saver" output="screen"/>
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
 
   <arg name="map" default="map_Bag_transform.yaml" /> <!-- Run the map server with the desired map -->
