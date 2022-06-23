@@ -10,13 +10,16 @@ from modifieddemo.srv import SaveMap
 
 
 cwd = os.getcwd()
-
+image = None
+imagesize = None
 
 def callbackMap(data):
+    global imagesize
     width = data.info.width
     height = data.info.height
     size =  (width , height)
     global image
+    imagesize = data.info
     image = np.zeros(size)
     
     counter = 0
@@ -46,8 +49,23 @@ def callbackMap(data):
 
 def callbackPath(data):
     poses = data.poses
+    print(poses[-1].pose.position.x,poses[-1].pose.position.y)
+    """ Point p1(0, 0)
+    Point p2(100, 0)
+    Point p3(200, 0) """ 
+    
+
 
 def saver(req):
+    global image
+    global imagesize
+    p4 = (imagesize.height/2, imagesize.width/2)
+    p2 = (20, 20)
+    thickness = 2
+    color = (0, 0, 255)
+    
+    image = cv2.line(image, p4, p2, color, thickness)
+
     filename = cwd+'/grid.png'
     print (cwd+'/grid.png'+"saving image")
     cv2.imwrite (filename,image)

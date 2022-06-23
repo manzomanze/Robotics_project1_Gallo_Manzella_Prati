@@ -8,7 +8,7 @@
   <node pkg="modifieddemo" type="odom_tf_modified" respawn="false" name="odom_tf_modified" output="screen"/>
 
   <!--  ************ add map_saver  ***************  -->
-  <node pkg="modifieddemo" type="map_saver" respawn="false" name="map_saver" output="screen"/>
+  <!-- <node pkg="modifieddemo" type="map_saver" respawn="false" name="map_saver" output="screen"/> -->
 
   <!-- **************  scan_merger **************  -->
   <include file="$(find modifieddemo)/launch/scan_merger.launch"/>
