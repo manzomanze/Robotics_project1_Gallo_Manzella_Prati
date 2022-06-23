@@ -4,6 +4,12 @@
 #include "nav_msgs/Path.h"
 #include "modifieddemo/SaveMap.h"
 
+ // Include CvBridge, Image Transport, Image msg
+ #include <image_transport/image_transport.h>
+ //#include <cv_bridge/cv_bridge.h>
+ #include <sensor_msgs/image_encodings.h>
+ #include <sensor_msgs/Image.h>
+
 
 class map_saver {
 
@@ -15,7 +21,8 @@ private:
 	nav_msgs::OccupancyGrid map;
 	nav_msgs::OccupancyGrid mapToSave;
 	nav_msgs::Path trajectory;
-	
+	sensor_msgs::Image image;
+	cv_bridge::CvImagePtr cv_ptr;
 	
 public:
   	map_saver(){
@@ -30,6 +37,11 @@ public:
 		map.header.stamp.sec = msg->header.stamp.sec;
 		map.info = msg->info;
 		map.data = msg->data; 
+
+		image.data = msg->data;
+		image.header = msg->header;
+		image.height = msg->info.height;
+		image.width = msg->info.width;
 	}
 
 	void trajectory_callback(const nav_msgs::Path::ConstPtr& msg){
@@ -48,6 +60,14 @@ public:
 	*/
 	bool saveMap(modifieddemo::SaveMap::Request &req, modifieddemo::SaveMap::Response &res) {
 		ROS_INFO("%d, %d, %f",req.value,map.header.stamp.nsec,trajectory.poses[req.value].pose.position.x);
+		cv_ptr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::MONO8);
+		
+		cv::line(image, 
+			new Point(10, 200),        //p1
+         	new Point(300, 200),       //p2
+         	new Scalar(0, 0, 255),     //Scalar object for color
+         	5                          //Thickness of the line
+		)
 		res.result = 200;
 		return true;
 	}

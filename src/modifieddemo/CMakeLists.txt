@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(modifieddemo)
 
-find_package(catkin REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
   std_msgs
   message_generation
+  sensor_msgs
+  image_transport
+  cv_bridge
 )
 
 add_message_files(
@@ -24,7 +26,7 @@ generate_messages(
   std_msgs
 )
 
-catkin_package(CATKIN_DEPENDS message_runtime)
+catkin_package(CATKIN_DEPENDS message_runtime cv_bridge)
 
 
 
