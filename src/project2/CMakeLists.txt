@@ -15,25 +15,25 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## Add custom message and its dependencies
-add_message_files(
-  FILES
-  #Wheels.msg
-)
+# add_message_files(
+#   FILES
+#   #Wheels.msg
+# )
 
-add_service_files(
-  FILES
-  #ResetPose.srv
-)
+# add_service_files(
+#   FILES
+#   #ResetPose.srv
+#)
 
 generate_messages(
   DEPENDENCIES
   std_msgs
 )
 
-generate_dynamic_reconfigure_options(
-  #cfg/parameters.cfg
-  #cfg/integMethod.cfg
-) 
+# generate_dynamic_reconfigure_options(
+#   #cfg/parameters.cfg
+#   #cfg/integMethod.cfg
+# ) 
 
 ## Declare a catkin package
 catkin_package(CATKIN_DEPENDS message_runtime)
