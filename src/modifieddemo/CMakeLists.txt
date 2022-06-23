@@ -12,9 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
-add_message_files(
-  FILES
-)
+# add_message_files(
+#   FILES
+# )
 
 add_service_files(
   FILES
