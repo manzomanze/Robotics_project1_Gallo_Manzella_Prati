@@ -4,6 +4,7 @@ project(modifieddemo)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   tf
   std_msgs
   message_generation
