@@ -15,15 +15,15 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## Add custom message and its dependencies
-add_message_files(
-  FILES
-  #Wheels.msg
-)
+# add_message_files(
+#   FILES
+#   #Wheels.msg
+# )
 
-add_service_files(
-  FILES
-  #ResetPose.srv
-)
+# add_service_files(
+#   FILES
+#   #ResetPose.srv
+# )
 
 generate_messages(
   DEPENDENCIES
