@@ -3,23 +3,29 @@ import rospy
 import numpy as np
 import cv2
 from nav_msgs.msg import OccupancyGrid
-from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseWithCovarianceStamped
 import os
 from modifieddemo.srv import SaveMap
+import math
 
-
+class Pose:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 cwd = os.getcwd()
 image = None
-imagesize = None
+imageInfo = None
+path = []
+
 
 def callbackMap(data):
-    global imagesize
+    global imageInfo
     width = data.info.width
     height = data.info.height
     size =  (width , height)
     global image
-    imagesize = data.info
+    imageInfo = data.info
     image = np.zeros(size)
     
     counter = 0
@@ -30,44 +36,49 @@ def callbackMap(data):
     
     
     
-    kernel = np.ones((2,2),np.uint8)
-    image = cv2.dilate(image,kernel,iterations = 1)
-    image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-    custom_map = OccupancyGrid()
+    # Add color to the image
+    img_float32 = np.float32(image)
+    image = cv2.cvtColor(img_float32, cv2.COLOR_GRAY2RGB)
 
-    custom_map.header = data.header
-    custom_map.info = data.info
-    custom_map.data =  np.transpose(image).flatten().astype (int)
-
-
-
-    image = cv2.rotate(image, cv2.ROTATE_180)
+    image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
     image[image == -1] = 150
     image[image == 0] = 255
     image[image == 100] = 0
-    print("AAAAAAAAAAAAAAAAAAAAAAAa")
+    print("Map received!")
 
 def callbackPath(data):
-    poses = data.poses
-    print(poses[-1].pose.position.x,poses[-1].pose.position.y)
-    """ Point p1(0, 0)
-    Point p2(100, 0)
-    Point p3(200, 0) """ 
-    
+    global image
+    global imageInfo
+    global path
+    thickness = 2
+    color = (0, 0, 255)
+    pose = Pose(data.pose.pose.position.x, data.pose.pose.position.y)
+    path.append(pose)
+
+    print(path[-1].x,path[-1].y)
+
+    if (len(path)>2):
+        point1 = transform_real_coords_to_img_coords(path[-2].x, path[-2].y, imageInfo)
+        point2 =  transform_real_coords_to_img_coords(path[-1].x, path[-1].y, imageInfo)
+        image = cv2.line(image, point1, point2, color, thickness)
+        print("AAAAAAAAAAAA")
+     
+def transform_real_coords_to_img_coords(pose_x, pose_y, image_info):
+    # Origin (0,0) is in the upper-left corner. 
+    # Y-axis has opposite direction w.r.t. usual y coordinate
+    origin_x = image_info.origin.position.x
+    origin_y = image_info.origin.position.y
+    x =    pose_x - origin_x
+    y =  - pose_y - origin_y # Y-axis has opposite direction
+    off_x = x // image_info.resolution
+    off_y = y // image_info.resolution
+    return (int(off_x), int(off_y))
 
 
 def saver(req):
     global image
-    global imagesize
-    p4 = (imagesize.height/2, imagesize.width/2)
-    p2 = (20, 20)
-    thickness = 2
-    color = (0, 0, 255)
-    
-    image = cv2.line(image, p4, p2, color, thickness)
-
-    filename = cwd+'/grid.png'
-    print (cwd+'/grid.png'+"saving image")
+    filename = req.value+'/grid.png'
+    print (req.value+'/grid.png'+ " saving image")
     cv2.imwrite (filename,image)
     return 200
 
@@ -76,7 +87,7 @@ def listener():
     rospy.init_node('depth_saver', anonymous=False)
 
     rospy.Subscriber("/map", OccupancyGrid, callbackMap)
-    rospy.Subscriber("/trajectory", Path, callbackPath)
+    rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, callbackPath)
 
     savemap = rospy.Service('saveMap', SaveMap, saver)
     
