@@ -56,7 +56,7 @@ def callbackPath(data):
     path.append(pose)
 
     print(path[-1].x,path[-1].y)
-
+    print(imageInfo.origin.position.x,imageInfo.origin.position.y)
     if (len(path)>2):
         point1 = transform_real_coords_to_img_coords(path[-2].x, path[-2].y, imageInfo)
         point2 =  transform_real_coords_to_img_coords(path[-1].x, path[-1].y, imageInfo)
