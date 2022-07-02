@@ -4,13 +4,13 @@
 
 
   <!--  ************** add odom tf  ***************  -->
-  <node pkg="modifieddemo" type="odom_tf_publish" respawn="false" name="odom_tf_publish" output="screen"/>
+  <node pkg="project2" type="odom_tf_publish" respawn="false" name="odom_tf_publish" output="screen"/>
 
   <!-- **************  scan_merger **************  -->
-  <include file="$(find modifieddemo)/config/scan_merger.launch.xml"/>
+  <include file="$(find project2)/config/scan_merger.launch.xml"/>
   
   <!-- **************  gmapping config **************  -->  
-  <include file="$(find modifieddemo)/config/gmapping.launch.xml"/>
+  <include file="$(find project2)/config/gmapping.launch.xml"/>
 
   <!-- ***************  TF Robot Transforms  *************** -->  
   <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_rear" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear "/>

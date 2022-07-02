@@ -5,7 +5,7 @@ import cv2
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PoseWithCovarianceStamped
 import os
-from modifieddemo.srv import SaveMap
+from project2.srv import SaveMap
 import math
 
 # Pose class
