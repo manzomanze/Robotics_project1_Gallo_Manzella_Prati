@@ -35,15 +35,13 @@ include_directories(
   include ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(odom_tf_modified
-  src/odom_tf_modified.cpp
+add_executable(odom_tf_publish
+  src/odom_tf_publish.cpp
 )
-add_dependencies(odom_tf_modified ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(odom_tf_modified
+add_dependencies(odom_tf_publish ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odom_tf_publish
   ${catkin_LIBRARIES}
 )
 
-add_executable(map_saver src/map_saver.cpp)
-add_dependencies(map_saver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(map_saver ${catkin_LIBRARIES})
+
 

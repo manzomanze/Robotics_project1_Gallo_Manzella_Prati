@@ -1,54 +1,33 @@
 <launch>
 
+  <!--  ************** add rviz  ***************  -->
   <param name="/use_sim_time" value="true"/>
 	<!-- Launches rviz with a config that shows merged lasers, odometry and map as created by gmapping -->
-	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find project2)/laser_map_odometry_for_amcl.rviz" >
+	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find modifieddemo)/rvizconfig/laser_map_odometry_for_amcl.rviz" />
 
-	</node>
-  <arg name="map" default="map_Bag_transform.yaml" /> <!-- Run the map server with the desired map -->
-
+  <!--  ************** add map server  ***************  -->
+  <arg name="map" default="map_from_gmap.yaml" /> <!-- Run the map server with the desired map -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find modifieddemo)/maps/$(arg map)"/>
 
   <!--  ************** add odom tf  ***************  -->
-  <node pkg="modifieddemo" type="odom_tf_modified" respawn="false" name="odom_tf_modified" output="screen"/>
-
-  <!--  ************ add map_saver  ***************  -->
-  <!-- <node pkg="modifieddemo" type="map_saver" respawn="false" name="map_saver" output="screen"/> -->
+  <node pkg="modifieddemo" type="odom_tf_publish" respawn="false" name="odom_tf_publish" output="screen"/>
 
   <!-- **************  scan_merger **************  -->
-  <include file="$(find modifieddemo)/launch/scan_merger.launch"/>
+  <include file="$(find modifieddemo)/config/scan_merger.launch.xml"/>
 
   <!-- ***************  Trajectory *************** -->
-  <include file="$(find modifieddemo)/launch/trajectory.launch"/>
-  <node pkg="tf2_ros" type="static_transform_publisher" name="mapTF" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map odom ">
-  </node>
+  <include file="$(find modifieddemo)/config/trajectory.launch.xml"/>
 
-   <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_rear" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear ">
-  </node>
-
-	<node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_front" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front ">
-	</node>
-  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link ">
-	</node>
+  <!-- ***************  TF Robot Transforms  *************** -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="mapTF" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map odom "/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_rear" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear "/>
+	<node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_front" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front "/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link "/>
 
   <!--  *****************  AMCL  ***************  -->
   <include file="$(find modifieddemo)/config/amcl.launch"/>
 
-  <node pkg="modifieddemo" type="smoothing_map.py" name="depth_saver" output="screen"/>
-  <!-- Set the name of the map yaml file: can be overridden on the command line. -->
-
- 
-
-  
-
- <!--  <node pkg="hector_geotiff" type="geotiff_node" name="hector_geotiff_node" 
-            output="screen" launch-prefix="nice -n 15">
-    <param name="map_file_path" type="string" value="$(find modifieddemo)/maps/$(arg map)" />
-    <param name="map_file_base_name" type="string" value="$(arg map_file_path)" />
-    <param name="geotiff_save_period" type="double" value="2" />
-    <param name="draw_background_checkerboard" type="bool" value="true" />
-    <param name="draw_free_space_grid" type="bool" value="true" />
-    <param name="plugins" type="string" value="hector_geotiff_plugins/TrajectoryMapWriter" />
-  </node> -->
+  <!--  ************** add python trajectory plotter on map  ***************  -->
+  <node pkg="modifieddemo" type="map_trajectory_plotter.py" name="depth_saver" output="screen"/>
   
 </launch>

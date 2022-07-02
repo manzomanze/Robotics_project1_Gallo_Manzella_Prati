@@ -4,31 +4,21 @@
 
 
   <!--  ************** add odom tf  ***************  -->
-   <node pkg="modifieddemo" type="odom_tf_modified" respawn="false" name="odom_tf_modified" output="screen"/>
-   
+  <node pkg="modifieddemo" type="odom_tf_publish" respawn="false" name="odom_tf_publish" output="screen"/>
 
-<!--  *****************  AMCL  ***************  -->
-<!-- <include file="$(find modifieddemo)/launch/amcl.launch"/> -->
-
- <!-- **************  Robot loc **************  -->
-<!-- <include file="$(find modifieddemo)/launch/localization.launch"/>
- -->
-<!-- **************  scan_merger **************  -->
-  <include file="$(find modifieddemo)/launch/scan_merger.launch"/>
+  <!-- **************  scan_merger **************  -->
+  <include file="$(find modifieddemo)/config/scan_merger.launch.xml"/>
   
-<!-- **************  gmapping config **************  -->  
+  <!-- **************  gmapping config **************  -->  
   <include file="$(find modifieddemo)/config/gmapping.launch.xml"/>
-    
-  <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_rear" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear ">
-    </node>
 
-	<node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_front" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front ">
-	</node>
-  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link ">
-	</node>
+  <!-- ***************  TF Robot Transforms  *************** -->  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_rear" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear "/>
+	<node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_robot_front" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front "/>
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link "/>
 
 	<!-- Launches rviz with a config that shows merged lasers, odometry and map as created by gmapping -->
-	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find project2)/laser_map_odometry.rviz" >
+	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find project2)/rvizconfig/laser_map_odometry.rviz" >
 	<param name="/use_sim_time" value="true"/>
 	</node>
 

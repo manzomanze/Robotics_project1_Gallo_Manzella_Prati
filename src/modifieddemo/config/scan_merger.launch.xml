@@ -13,15 +13,4 @@
 	<param name="range_max" value="50.0"/>
 	<param name="/use_sim_time" value="true"/>
 	</node>
-	
-	
-
-	
-
-
-	<!-- <node pkg="tf" type="static_transform_publisher" name="base_link_to_scan" args="0.0 0.0 0.0 0.0 0.0 0.0 base_link scan 100" /> -->
-	
-
-
-
 </launch>
