@@ -1,1 +1,1 @@
-open the src file two have a desription of the two projects
+open the src file to read the description of the two projects
